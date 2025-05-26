@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Detayı - KW Commercial</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ilan-detay.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html">KW Commercial</a></h1>
+            </div>
+            <div class="auth-section">
+                <button id="loginBtn" class="login-btn">Google ile Giriş Yap</button>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName">Kullanıcı</span>
+                    <button id="logoutBtn" class="logout-btn">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="loading" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p>İlan detayları yükleniyor...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage" style="display: none;">
+        <div class="error-container">
+            <h2>İlan Bulunamadı</h2>
+            <p>Aradığınız ilan mevcut değil veya kaldırılmış olabilir.</p>
+            <button class="back-btn" onclick="goBack()">← Ana Sayfaya Dön</button>
+        </div>
+    </div>
+
+    <!-- Detail Container -->
+    <div class="detail-container" id="detailContainer" style="display: none;">
+        <!-- Back Button -->
+        <div class="back-section">
+            <button class="back-btn" onclick="goBack()">← Geri Dön</button>
+        </div>
+
+        <!-- Main Image -->
+        <div class="image-section">
+            <img id="listingMainImage" src="" alt="İlan Görseli" class="main-image">
+        </div>
+
+        <!-- Detail Content -->
+        <div class="detail-content">
+            <div class="detail-header">
+                <h1 id="listingTitle" class="detail-title">İlan Başlığı</h1>
+                <div class="detail-price" id="listingPrice">0 TL</div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="details-grid">
+                <!-- Temel Bilgiler -->
+                <div class="detail-section">
+                    <h3>Temel Bilgiler</h3>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <label>İlan Tarihi</label>
+                            <span id="listingDate">-</span>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <label>Danışman</label>
+                            <span id="listingAdvisor">-</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <label>Portföy Cinsi</label>
+                            <span id="portfolioType">-</span>
+                        </div>
+
+                        <div class="detail-item">
+                            <label>Kullanım Amacı</label>
+                            <span id="usagePurpose">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konum Bilgileri -->
+                <div class="detail-section">
+                    <h3>Konum Bilgileri</h3>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <label>İl</label>
+                            <span id="listingCity">-</span>
+                        </div>
+
+                        <div class="detail-item">
+                            <label>İlçe</label>
+                            <span id="listingDistrict">-</span>
+                        </div>
+
+                        <div class="detail-item">
+                            <label>Mahalle</label>
+                            <span id="listingNeighborhood">-</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <label>Ada / Parsel</label>
+                            <span id="islandParcel">-</span>
+                        </div>
+
+                        <div class="detail-item">
+                            <label>İmar Durumu</label>
+                            <span id="zoningStatus">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fiyat Bilgisi -->
+                <div class="detail-section">
+                    <h3>Fiyat Bilgisi</h3>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item full-width">
+                            <label>Fiyat</label>
+                            <span id="detailPrice" class="price-highlight">0 TL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Açıklama -->
+                <div class="detail-section">
+                    <h3>Açıklama</h3>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item full-width">
+                            <div id="listingDescription" class="description-text">
+                                Açıklama bulunmuyor.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="contact-btn">
+                    📞 Danışmanla İletişime Geç
+                </button>
+                <button class="share-btn" onclick="shareProperty()">
+                    🔗 İlanı Paylaş
+                </button>
+                <button class="favorite-btn" onclick="toggleFavorite()">
+                    ❤️ Favorilere Ekle
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="ilan-detay.js"></script>
+</body>
+</html>

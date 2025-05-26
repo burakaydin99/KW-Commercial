@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni İlan Ekle - KW Commercial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html">KW Commercial</a></h1>
+            </div>
+            <div class="auth-section">
+                <button id="loginBtn" class="login-btn">Google ile Giriş Yap</button>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName">Kullanıcı</span>
+                    <button id="logoutBtn" class="logout-btn">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="form-container">
+        <div class="form-header">
+            <h2>Yeni İlan Ekle</h2>
+            <p>Ticari gayrimenkul ilanınızın detaylarını giriniz</p>
+        </div>
+
+        <form id="addListingForm" class="listing-form">
+            <div class="form-section">
+                <h3>Temel Bilgiler</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="listingTitle">İlan Başlığı *</label>
+                        <input type="text" id="listingTitle" name="listingTitle" required 
+                               placeholder="Örn: Merkezi Konumda Satılık Ofis">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="listingDate">Tarih *</label>
+                        <input type="date" id="listingDate" name="listingDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="advisorDetails">Danışman Detay *</label>
+                        <input type="text" id="advisorDetails" name="advisorDetails" required 
+                               placeholder="Danışman adı ve iletişim bilgileri">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="portfolioType">Portföy Cinsi *</label>
+                        <select id="portfolioType" name="portfolioType" required>
+                            <option value="">Seçiniz</option>
+                            <option value="MUSTAKİL BİNA">Mustakil Bina</option>
+                            <option value="BİNA KATI VEYA BÖLÜMÜ">Bina Katı veya Bölümü</option>
+                            <option value="DÜKKAN-MAĞAZA">Dükkan-Mağaza</option>
+                            <option value="ARSA">Arsa</option>
+                            <option value="TARLA">Tarla</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usagePurpose">Kullanım Amacı *</label>
+                        <select id="usagePurpose" name="usagePurpose" required>
+                            <option value="">Seçiniz</option>
+                            <option value="HİZMET OFİS">Hizmet Ofis</option>
+                            <option value="EĞİTİM">Eğitim</option>
+                            <option value="SAĞLIK">Sağlık</option>
+                            <option value="TURİZM">Turizm</option>
+                            <option value="PERAKENDE">Perakende</option>
+                            <option value="GIDA">Gıda</option>
+                            <option value="SANAYİ-İMALAT">Sanayi-İmalat</option>
+                            <option value="LOJİSTİK">Lojistik</option>
+                            <option value="YURT">Yurt</option>
+                            <option value="YATIRIM">Yatırım</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Konum Bilgileri</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">İl *</label>
+                        <select id="city" name="city" required>
+                            <option value="">Seçiniz</option>
+                            <option value="İstanbul">İstanbul</option>
+                            <option value="Ankara">Ankara</option>
+                            <option value="İzmir">İzmir</option>
+                            <option value="Bursa">Bursa</option>
+                            <option value="Antalya">Antalya</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="district">İlçe *</label>
+                        <select id="district" name="district" required>
+                            <option value="">Önce il seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="neighborhood">Mahalle *</label>
+                        <select id="neighborhood" name="neighborhood" required>
+                            <option value="">Önce ilçe seçiniz</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="islandParcel">Ada / Parsel</label>
+                        <input type="text" id="islandParcel" name="islandParcel" 
+                               placeholder="Örn: Ada: 123, Parsel: 45">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="zoningStatus">İmar Durumu</label>
+                        <input type="text" id="zoningStatus" name="zoningStatus" 
+                               placeholder="Örn: Ticari, Konut, Sanayi">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Fiyat ve Görsel</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Fiyat (TL) *</label>
+                        <input type="number" id="price" name="price" required 
+                               placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="listingImage">İlan Görseli</label>
+                        <input type="file" id="listingImage" name="listingImage" 
+                               accept="image/*" class="file-input">
+                        <div class="file-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" src="" alt="Önizleme">
+                            <button type="button" class="remove-image" onclick="removeImage()">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Açıklama</h3>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="description">Detaylı Açıklama</label>
+                        <textarea id="description" name="description" rows="5" 
+                                  placeholder="Gayrimenkulün detaylı açıklamasını yazınız..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" onclick="window.history.back()">
+                    İptal
+                </button>
+                <button type="submit" class="submit-btn">
+                    İlanı Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="add-listing.js"></script>
+</body>
+</html>

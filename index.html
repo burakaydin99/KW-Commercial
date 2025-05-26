@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KW Commercial - Ticari Gayrimenkul</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>KW Commercial</h1>
+            </div>
+            <div class="auth-section">
+                <button id="loginBtn" class="login-btn">Google ile Giriş Yap</button>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName">Kullanıcı</span>
+                    <button id="logoutBtn" class="logout-btn">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar Filters -->
+        <aside class="sidebar">
+            <div class="search-section">
+                <h3>Arama</h3>
+                <input type="text" id="searchInput" placeholder="Arama yapın..." class="search-input">
+            </div>
+
+            <div class="filters">
+                <h3>Filtreler</h3>
+                
+                <div class="filter-group">
+                    <label>Tarih</label>
+                    <input type="date" id="dateFilter" class="filter-input">
+                </div>
+
+                <div class="filter-group">
+                    <label>Danışman</label>
+                    <input type="text" id="advisorFilter" placeholder="Danışman adı" class="filter-input">
+                </div>
+
+                <div class="filter-group">
+                    <label>Portföy Cinsi</label>
+                    <select id="portfolioTypeFilter" class="filter-select">
+                        <option value="">Tümü</option>
+                        <option value="MUSTAKİL BİNA">Mustakil Bina</option>
+                        <option value="BİNA KATI VEYA BÖLÜMÜ">Bina Katı veya Bölümü</option>
+                        <option value="DÜKKAN-MAĞAZA">Dükkan-Mağaza</option>
+                        <option value="ARSA">Arsa</option>
+                        <option value="TARLA">Tarla</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Kullanım Amacı</label>
+                    <select id="usagePurposeFilter" class="filter-select">
+                        <option value="">Tümü</option>
+                        <option value="HİZMET OFİS">Hizmet Ofis</option>
+                        <option value="EĞİTİM">Eğitim</option>
+                        <option value="SAĞLIK">Sağlık</option>
+                        <option value="TURİZM">Turizm</option>
+                        <option value="PERAKENDE">Perakende</option>
+                        <option value="GIDA">Gıda</option>
+                        <option value="SANAYİ-İMALAT">Sanayi-İmalat</option>
+                        <option value="LOJİSTİK">Lojistik</option>
+                        <option value="YURT">Yurt</option>
+                        <option value="YATIRIM">Yatırım</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>İl</label>
+                    <select id="cityFilter" class="filter-select">
+                        <option value="">Tümü</option>
+                        <option value="İstanbul">İstanbul</option>
+                        <option value="Ankara">Ankara</option>
+                        <option value="İzmir">İzmir</option>
+                        <option value="Bursa">Bursa</option>
+                        <option value="Antalya">Antalya</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>İlçe</label>
+                    <select id="districtFilter" class="filter-select">
+                        <option value="">Tümü</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Bütçe (TL)</label>
+                    <div class="budget-range">
+                        <input type="number" id="minBudget" placeholder="Min" class="budget-input">
+                        <span>-</span>
+                        <input type="number" id="maxBudget" placeholder="Max" class="budget-input">
+                    </div>
+                </div>
+
+                <button class="clear-filters-btn">Filtreleri Temizle</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="content-header">
+                <h2>Ticari Gayrimenkul İlanları</h2>
+                <button class="add-listing-btn" onclick="window.location.href='yeni-ilan.html'">
+                    + Yeni İlan Ekle
+                </button>
+            </div>
+
+            <div class="listing-count">
+                <span id="listingCount">0 ilan bulundu</span>
+            </div>
+
+            <div class="listings-container" id="listingsContainer">
+                <!-- Listings will be populated by JavaScript -->
+            </div>
+
+            <div class="loading" id="loadingSpinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Yükleniyor...</p>
+            </div>
+
+            <div class="no-results" id="noResults" style="display: none;">
+                <p>Arama kriterlerinize uygun ilan bulunamadı.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
