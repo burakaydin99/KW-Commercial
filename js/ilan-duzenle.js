@@ -327,7 +327,7 @@ function getListingIdFromUrl() {
 
 async function loadListingForEdit() {
     const listingId = getListingIdFromUrl();
-    console.log('📋 İlan yükleniyor, ID:', listingId);
+    console.log(' KW Teknoloji | İlan yükleniyor, ID:', listingId);
     
     if (!listingId) {
         showError('İlan ID\'si bulunamadı.');
@@ -344,10 +344,10 @@ async function loadListingForEdit() {
         showLoading();
         
         // Firestore'dan ilan verisini çek
-        console.log('🔄 Firestore\'dan ilan yükleniyor:', listingId);
+        console.log('KW Teknoloji | ilan yükleniyor:', listingId);
         const listing = await window.firestoreService.getListing(listingId);
         
-        console.log('📄 Yüklenen ilan:', listing);
+        console.log(' Yüklenen ilan:', listing);
         
         if (!listing) {
             showError('İlan bulunamadı.');
