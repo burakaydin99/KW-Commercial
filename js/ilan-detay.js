@@ -1,7 +1,8 @@
-// ilan-detay.js - İlan detay sayfası için
+// js/ilan-detay.js - İlan detay sayfası için Firebase entegre
 
-// ✅ Değişken çakışmasını önlemek için farklı isim kullan
-let detailListings = [];
+// Firebase servisleri import edilecek (HTML'de)
+// import { authService } from './auth-service.js';
+// import { firestoreService } from './firestore-service.js';
 
 // DOM elements
 const loginBtn = document.getElementById('loginBtn');
@@ -12,99 +13,78 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 const errorMessage = document.getElementById('errorMessage');
 const detailContainer = document.getElementById('detailContainer');
 
-// Authentication state
+// State
 let isLoggedIn = false;
 let currentUser = null;
 let currentListing = null;
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('Detail page DOM loaded, initializing...');
     
-    // ✅ Güvenli şekilde veri yükle
-    loadDetailData();
+    // Wait for Firebase services to load
+    await waitForFirebaseServices();
     
-    initializeAuth();
+    // Auth state dinle
+    authService.onAuthStateChange(handleAuthChange);
+    
+    // Event listeners
     setupEventListeners();
-    loadListingDetail();
+    
+    // İlan detayını yükle
+    await loadListingDetail();
 });
 
-// ✅ Veri yükleme fonksiyonu
-function loadDetailData() {
-    try {
-        // Shared data'dan veri al
-        detailListings = getSharedListings();
-        console.log('Detail listings loaded successfully:', detailListings.length);
-    } catch (error) {
-        console.error('Error loading detail listings:', error);
-        // Fallback: boş array
-        detailListings = [];
-    }
-}
-
-// Authentication functions
-function initializeAuth() {
-    if (sessionStorage.getItem('mockLoggedIn') === 'true') {
-        currentUser = {
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            id: '123456789'
+// Firebase servislerinin yüklenmesini bekle
+function waitForFirebaseServices() {
+    return new Promise((resolve) => {
+        const checkServices = () => {
+            if (window.authService && window.firestoreService) {
+                resolve();
+            } else {
+                setTimeout(checkServices, 100);
+            }
         };
-        isLoggedIn = true;
-        showUserInfo();
-        console.log('User logged in:', currentUser);
-    } else {
-        console.log('User not logged in');
-    }
+        checkServices();
+    });
 }
 
-function showUserInfo() {
+// Auth state change handler
+function handleAuthChange(user) {
+    currentUser = user;
+    isLoggedIn = !!user;
+    
+    if (user) {
+        showUserInfo(user);
+        console.log('✅ User logged in:', user.email);
+    } else {
+        hideUserInfo();
+        console.log('👤 User logged out');
+    }
+    
+    // Edit butonunu güncelle
+    setTimeout(() => {
+        setupEditButton();
+    }, 100);
+}
+
+// User info göster
+function showUserInfo(user) {
     if (loginBtn) loginBtn.style.display = 'none';
     if (userInfo) userInfo.style.display = 'flex';
-    if (userName) userName.textContent = currentUser.name;
+    if (userName) userName.textContent = user.displayName || user.email;
 }
 
+// User info gizle
 function hideUserInfo() {
     if (loginBtn) loginBtn.style.display = 'block';
     if (userInfo) userInfo.style.display = 'none';
 }
 
-function mockLogin() {
-    const mockUser = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        id: '123456789'
-    };
-    
-    currentUser = mockUser;
-    isLoggedIn = true;
-    sessionStorage.setItem('mockLoggedIn', 'true');
-    showUserInfo();
-    
-    alert('Giriş başarılı! (Mock Login)');
-    
-    // ✅ Edit butonunu göstermek için
-    setupEditButton();
-}
-
-function logout() {
-    currentUser = null;
-    isLoggedIn = false;
-    sessionStorage.removeItem('mockLoggedIn');
-    hideUserInfo();
-    alert('Çıkış yapıldı!');
-    
-    // Remove edit button immediately
-    const existingEditBtn = document.querySelector('.edit-btn');
-    if (existingEditBtn) {
-        existingEditBtn.remove();
-    }
-}
-
 // Event listeners
 function setupEventListeners() {
-    if (loginBtn) loginBtn.addEventListener('click', mockLogin);
-    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+    if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
     
     // Contact button event
     const contactBtn = document.querySelector('.contact-btn');
@@ -120,7 +100,7 @@ function setupEventListeners() {
             
             // Try to open WhatsApp if on mobile, otherwise show contact info
             if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                const whatsappUrl = authService.createWhatsAppLink(currentListing.advisorPhone, message);
                 window.open(whatsappUrl, '_blank');
             } else {
                 alert(`Danışman İletişim Bilgileri:\n\n${advisor}\n\nMesaj: ${message}\n\nWhatsApp veya telefon ile iletişime geçebilirsiniz.`);
@@ -129,31 +109,58 @@ function setupEventListeners() {
     }
 }
 
+// Login
+async function handleLogin() {
+    try {
+        const result = await authService.signInWithGoogle();
+        if (result.user) {
+            console.log('✅ Login successful');
+        }
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        alert('Giriş yapılırken hata oluştu: ' + error.message);
+    }
+}
+
+// Logout
+async function handleLogout() {
+    try {
+        await authService.signOut();
+        console.log('✅ Logout successful');
+    } catch (error) {
+        console.error('❌ Logout error:', error);
+        alert('Çıkış yapılırken hata oluştu');
+    }
+}
+
 // Get listing ID from URL
 function getListingIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    return parseInt(urlParams.get('id'));
+    const id = urlParams.get('id');
+    console.log('📋 Listing ID from URL:', id);
+    return id;
 }
 
 // Load listing detail
-function loadListingDetail() {
+async function loadListingDetail() {
     const listingId = getListingIdFromUrl();
     console.log('Loading listing with ID:', listingId);
     
     if (!listingId) {
-        showError();
+        console.error('❌ No listing ID provided');
+        showError('İlan ID\'si bulunamadı.');
         return;
     }
 
-    // Simulate loading delay
-    setTimeout(() => {
-        // ✅ Güncel veriyi al
-        detailListings = getSharedListings();
-        const listing = detailListings.find(l => l.id === listingId);
+    try {
+        // Firestore'dan ilan al
+        showLoading();
+        const listing = await firestoreService.getListing(listingId);
         console.log('Found listing:', listing);
         
         if (!listing) {
-            showError();
+            console.error('❌ Listing not found:', listingId);
+            showError('İlan bulunamadı.');
             return;
         }
 
@@ -165,10 +172,14 @@ function loadListingDetail() {
         setTimeout(() => {
             setupEditButton();
         }, 100);
-    }, 800);
+        
+    } catch (error) {
+        console.error('❌ Error loading listing:', error);
+        showError('İlan yüklenirken hata oluştu.');
+    }
 }
 
-// Setup edit button - NO ownership check, only login check
+// Setup edit button - Permission-based
 function setupEditButton() {
     console.log('Setting up edit button. Logged in:', isLoggedIn, 'Current listing:', currentListing?.id);
     
@@ -184,8 +195,8 @@ function setupEditButton() {
         console.log('Removed existing edit button');
     }
     
-    // Add edit button if user is logged in - NO ownership check
-    if (isLoggedIn && currentUser) {
+    // Add edit button if user has permission
+    if (isLoggedIn && authService.canEditListing(currentListing)) {
         const actionButtons = document.querySelector('.action-buttons');
         
         if (actionButtons) {
@@ -196,20 +207,34 @@ function setupEditButton() {
             
             // Insert edit button as the first button
             actionButtons.insertBefore(editBtn, actionButtons.firstChild);
-            console.log('Edit button added successfully');
+            console.log('✅ Edit button added successfully');
         } else {
             console.log('Action buttons container not found');
         }
     } else {
-        console.log('User not logged in, edit button not added');
+        console.log('❌ User has no edit permission for this listing');
     }
 }
 
+// Show loading
+function showLoading() {
+    if (loadingSpinner) loadingSpinner.style.display = 'block';
+    if (errorMessage) errorMessage.style.display = 'none';
+    if (detailContainer) detailContainer.style.display = 'none';
+}
+
 // Show error message
-function showError() {
+function showError(message) {
     if (loadingSpinner) loadingSpinner.style.display = 'none';
     if (errorMessage) errorMessage.style.display = 'block';
     if (detailContainer) detailContainer.style.display = 'none';
+    
+    if (message) {
+        const errorText = errorMessage.querySelector('p');
+        if (errorText) {
+            errorText.textContent = message;
+        }
+    }
 }
 
 // Show detail container
@@ -228,7 +253,7 @@ function populateListingDetail(listing) {
     // Main image
     const mainImage = document.getElementById('listingMainImage');
     if (mainImage) {
-        mainImage.src = listing.image;
+        mainImage.src = listing.image || 'https://via.placeholder.com/400x300/667eea/ffffff?text=Resim+Yok';
         mainImage.alt = listing.title;
     }
 
@@ -277,6 +302,24 @@ function populateListingDetail(listing) {
     if (descriptionElement) descriptionElement.textContent = listing.description || 'Açıklama bulunmuyor.';
 }
 
+// Edit function
+function editListing() {
+    console.log('Edit listing clicked');
+    
+    if (!isLoggedIn) {
+        alert('İlan düzenlemek için giriş yapmanız gerekiyor.');
+        return;
+    }
+    
+    if (!currentListing) {
+        alert('İlan bilgileri yüklenemedi.');
+        return;
+    }
+    
+    console.log('Redirecting to edit page for listing:', currentListing.id);
+    window.location.href = `ilan-duzenle.html?id=${currentListing.id}`;
+}
+
 // Utility functions
 function getDisplayText(value) {
     const displayTexts = {
@@ -321,25 +364,6 @@ function goBack() {
         // Fallback to main page
         window.location.href = 'index.html';
     }
-}
-
-// Edit function - NO ownership check
-function editListing() {
-    console.log('Edit listing clicked');
-    
-    if (!isLoggedIn) {
-        alert('İlan düzenlemek için giriş yapmanız gerekiyor.');
-        return;
-    }
-    
-    if (!currentListing) {
-        alert('İlan bilgileri yüklenemedi.');
-        return;
-    }
-    
-    console.log('Redirecting to edit page for listing:', currentListing.id);
-    // NO ownership check - any logged in user can edit any listing
-    window.location.href = `ilan-duzenle.html?id=${currentListing.id}`;
 }
 
 // Action functions
@@ -437,9 +461,9 @@ document.addEventListener('keydown', function(event) {
         goBack();
     }
     
-    // E key to edit (if user is logged in - NO ownership check)
+    // E key to edit (if user has permission)
     if (event.key === 'e' || event.key === 'E') {
-        if (isLoggedIn && currentUser && currentListing) {
+        if (isLoggedIn && currentListing && authService.canEditListing(currentListing)) {
             editListing();
         }
     }

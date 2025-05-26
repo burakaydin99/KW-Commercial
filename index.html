@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KW Commercial - Ticari Gayrimenkul</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <!-- Header -->
@@ -14,8 +14,9 @@
                 <h1>KW Commercial</h1>
             </div>
             <div class="auth-section">
-                <button id="loginBtn" class="login-btn">Google ile Giriş Yap</button>
+                <button id="loginBtn" class="login-btn">🔐 Google ile Giriş Yap</button>
                 <div id="userInfo" class="user-info" style="display: none;">
+                    <img id="userPhoto" class="user-photo" src="" alt="User">
                     <span id="userName">Kullanıcı</span>
                     <button id="logoutBtn" class="logout-btn">Çıkış</button>
                 </div>
@@ -23,7 +24,15 @@
         </div>
     </header>
 
-    <div class="main-container">
+    <!-- Loading Screen -->
+    <div id="appLoading" class="app-loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>🔥 Firebase bağlanıyor...</p>
+        </div>
+    </div>
+
+    <div class="main-container" id="mainContainer" style="display: none;">
         <!-- Sidebar Filters -->
         <aside class="sidebar">
             <div class="search-section">
@@ -115,7 +124,7 @@
             </div>
 
             <div class="listing-count">
-                <span id="listingCount">0 ilan bulundu</span>
+                <span id="listingCount">🔄 İlanlar yükleniyor...</span>
             </div>
 
             <div class="listings-container" id="listingsContainer">
@@ -133,8 +142,521 @@
         </main>
     </div>
 
-    <!-- Script dosyalarını doğru sırayla yükleyin -->
-    <script src="shared-data.js"></script>
-    <script src="script.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebase modülleri
+        import { authService } from './js/auth-service.js';
+        import { firestoreService } from './js/firestore-service.js';
+        import { storageService } from './js/storage-service.js';
+
+
+        // Global variables
+        let allListings = [];
+        let isLoggedIn = false;
+        let currentUser = null;
+
+        // Location data
+        const locationData = {
+            "İstanbul": {
+                "Şişli": ["Mecidiyeköy", "Levent", "Gayrettepe"],
+                "Kadıköy": ["Moda", "Bağdat Caddesi", "Fenerbahçe"],
+                "Beşiktaş": ["Etiler", "Bebek", "Ortaköy"]
+            },
+            "Ankara": {
+                "Çankaya": ["Kızılay", "Bahçelievler", "Balgat"],
+                "Keçiören": ["Etimesgut", "Ostim", "Çamlıdere"]
+            },
+            "İzmir": {
+                "Konak": ["Alsancak", "Pasaport", "Kemeraltı"],
+                "Karşıyaka": ["Bostanlı", "Mavişehir", "Çiğli"]
+            },
+            "Bursa": {
+                "Osmangazi": ["Organize Sanayi", "Heykel", "Santral Garaj"],
+                "Nilüfer": ["Görükle", "Özlüce", "Beşevler"]
+            },
+            "Antalya": {
+                "Muratpaşa": ["Lara", "Konyaaltı", "Varsak"],
+                "Kepez": ["Dokuma", "Şirinyalı", "Hurma"]
+            }
+        };
+
+        // DOM elements
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userPhoto = document.getElementById('userPhoto');
+        const listingsContainer = document.getElementById('listingsContainer');
+        const listingCount = document.getElementById('listingCount');
+        const appLoading = document.getElementById('appLoading');
+        const mainContainer = document.getElementById('mainContainer');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const noResults = document.getElementById('noResults');
+
+        // Filter elements
+        const searchInput = document.getElementById('searchInput');
+        const dateFilter = document.getElementById('dateFilter');
+        const advisorFilter = document.getElementById('advisorFilter');
+        const portfolioTypeFilter = document.getElementById('portfolioTypeFilter');
+        const usagePurposeFilter = document.getElementById('usagePurposeFilter');
+        const cityFilter = document.getElementById('cityFilter');
+        const districtFilter = document.getElementById('districtFilter');
+        const minBudget = document.getElementById('minBudget');
+        const maxBudget = document.getElementById('maxBudget');
+        const clearFiltersBtn = document.querySelector('.clear-filters-btn');
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 KW Commercial Firebase App starting...');
+            
+            try {
+                // Auth state dinle
+                authService.onAuthStateChange(handleAuthChange);
+                
+                // İlanları yükle
+                await loadListings();
+                
+                // Event listeners
+                setupEventListeners();
+                setupLocationFilters();
+                
+                // App hazır
+                hideAppLoading();
+                
+                console.log('✅ App initialized successfully');
+            } catch (error) {
+                console.error('❌ App initialization error:', error);
+                hideAppLoading();
+                showError('Uygulama başlatılırken hata oluştu: ' + error.message);
+            }
+        });
+
+        // Auth state change handler
+        function handleAuthChange(user) {
+            currentUser = user;
+            isLoggedIn = !!user;
+            
+            if (user) {
+                showUserInfo(user);
+                console.log('✅ User logged in:', user.email);
+            } else {
+                hideUserInfo();
+                console.log('👤 User logged out');
+            }
+            
+            // İlanları yeniden render et (edit butonları için)
+            displayListings(allListings);
+        }
+
+        // User info göster
+        function showUserInfo(user) {
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (userInfo) userInfo.style.display = 'flex';
+            if (userName) userName.textContent = user.displayName || user.email;
+            if (userPhoto && user.photoURL) {
+                userPhoto.src = user.photoURL;
+                userPhoto.style.display = 'block';
+            }
+        }
+
+        // User info gizle
+        function hideUserInfo() {
+            if (loginBtn) loginBtn.style.display = 'block';
+            if (userInfo) userInfo.style.display = 'none';
+        }
+
+        // Login
+        async function handleLogin() {
+            try {
+                showLoading('Giriş yapılıyor...');
+                const result = await authService.signInWithGoogle();
+                
+                if (result.user) {
+                    console.log('✅ Login successful');
+                    // Başarılı giriş mesajı
+                    showSuccessMessage('Giriş başarılı! Hoş geldiniz.');
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Logout
+        async function handleLogout() {
+            try {
+                await authService.signOut();
+                showSuccessMessage('Çıkış yapıldı!');
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                showError('Çıkış yapılırken hata oluştu');
+            }
+        }
+
+        // İlanları yükle
+        async function loadListings() {
+            try {
+                showLoading('İlanlar yükleniyor...');
+                
+                // Real-time listener kur
+                firestoreService.subscribeToListings((listings) => {
+                    allListings = listings;
+                    displayListings(listings);
+                    updateListingCount(listings);
+                    hideLoading();
+                    
+                    console.log(`📋 ${listings.length} listing loaded`);
+                });
+
+                // İlk kez boşsa varsayılan ilanları ekle
+                const currentListings = await firestoreService.getAllListings();
+                if (currentListings.length === 0) {
+                    console.log('🌱 Seeding default listings...');
+                    await firestoreService.seedDefaultListings();
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading listings:', error);
+                hideLoading();
+                showError('İlanlar yüklenirken hata oluştu');
+            }
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+            
+            // Filter events
+            if (searchInput) searchInput.addEventListener('input', debounce(applyFilters, 300));
+            if (dateFilter) dateFilter.addEventListener('change', applyFilters);
+            if (advisorFilter) advisorFilter.addEventListener('input', debounce(applyFilters, 300));
+            if (portfolioTypeFilter) portfolioTypeFilter.addEventListener('change', applyFilters);
+            if (usagePurposeFilter) usagePurposeFilter.addEventListener('change', applyFilters);
+            if (cityFilter) cityFilter.addEventListener('change', applyFilters);
+            if (districtFilter) districtFilter.addEventListener('change', applyFilters);
+            if (minBudget) minBudget.addEventListener('input', debounce(applyFilters, 500));
+            if (maxBudget) maxBudget.addEventListener('input', debounce(applyFilters, 500));
+            if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', clearAllFilters);
+        }
+
+        // Location filters
+        function setupLocationFilters() {
+            if (cityFilter) {
+                cityFilter.addEventListener('change', function() {
+                    updateDistrictOptions();
+                    applyFilters();
+                });
+            }
+        }
+
+        function updateDistrictOptions() {
+            if (!cityFilter || !districtFilter) return;
+            
+            const selectedCity = cityFilter.value;
+            districtFilter.innerHTML = '<option value="">Tümü</option>';
+            
+            if (selectedCity && locationData[selectedCity]) {
+                Object.keys(locationData[selectedCity]).forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtFilter.appendChild(option);
+                });
+            }
+        }
+
+        // Debounce
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const filteredListings = filterListings(allListings);
+            displayListings(filteredListings);
+            updateListingCount(filteredListings);
+        }
+
+        // Filter listings
+        function filterListings(listings) {
+            return listings.filter(listing => {
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                const matchesSearch = !searchTerm || 
+                    listing.title.toLowerCase().includes(searchTerm) ||
+                    (listing.description && listing.description.toLowerCase().includes(searchTerm)) ||
+                    listing.advisor.toLowerCase().includes(searchTerm);
+                
+                const dateValue = dateFilter ? dateFilter.value : '';
+                const matchesDate = !dateValue || listing.date >= dateValue;
+                
+                const advisorValue = advisorFilter ? advisorFilter.value.toLowerCase() : '';
+                const matchesAdvisor = !advisorValue || 
+                    listing.advisor.toLowerCase().includes(advisorValue);
+                
+                const portfolioValue = portfolioTypeFilter ? portfolioTypeFilter.value : '';
+                const matchesPortfolio = !portfolioValue || listing.portfolioType === portfolioValue;
+                
+                const usageValue = usagePurposeFilter ? usagePurposeFilter.value : '';
+                const matchesUsage = !usageValue || listing.usagePurpose === usageValue;
+                
+                const cityValue = cityFilter ? cityFilter.value : '';
+                const matchesCity = !cityValue || listing.city === cityValue;
+                
+                const districtValue = districtFilter ? districtFilter.value : '';
+                const matchesDistrict = !districtValue || listing.district === districtValue;
+                
+                const minBudgetValue = minBudget ? minBudget.value : '';
+                const maxBudgetValue = maxBudget ? maxBudget.value : '';
+                const matchesBudget = (!minBudgetValue || listing.price >= parseInt(minBudgetValue)) &&
+                                      (!maxBudgetValue || listing.price <= parseInt(maxBudgetValue));
+                
+                return matchesSearch && matchesDate && matchesAdvisor && 
+                       matchesPortfolio && matchesUsage && matchesCity && 
+                       matchesDistrict && matchesBudget;
+            });
+        }
+
+        // Clear filters
+        function clearAllFilters() {
+            if (searchInput) searchInput.value = '';
+            if (dateFilter) dateFilter.value = '';
+            if (advisorFilter) advisorFilter.value = '';
+            if (portfolioTypeFilter) portfolioTypeFilter.value = '';
+            if (usagePurposeFilter) usagePurposeFilter.value = '';
+            if (cityFilter) cityFilter.value = '';
+            if (districtFilter) districtFilter.value = '';
+            if (minBudget) minBudget.value = '';
+            if (maxBudget) maxBudget.value = '';
+            
+            updateDistrictOptions();
+            applyFilters();
+        }
+
+        // Display listings
+        function displayListings(listingsToShow) {
+            if (!listingsContainer) return;
+            
+            if (listingsToShow.length === 0) {
+                showNoResults();
+                return;
+            }
+            
+            hideNoResults();
+            
+            const fragment = document.createDocumentFragment();
+            
+            listingsToShow.forEach(listing => {
+                const listingElement = createListingElement(listing);
+                fragment.appendChild(listingElement);
+            });
+            
+            listingsContainer.innerHTML = '';
+            listingsContainer.appendChild(fragment);
+        }
+
+        // Create listing element
+// Create listing element - Permission-based edit button
+function createListingElement(listing) {
+    const div = document.createElement('div');
+    div.className = 'listing-card';
+    div.onclick = () => viewListingDetails(listing.id);
+    
+    // WhatsApp button
+    const whatsappBtn = listing.advisorPhone ? 
+        `<button class="whatsapp-btn" onclick="event.stopPropagation(); openWhatsApp('${listing.advisorPhone}', '${listing.title}', '${listing.price}')">
+            📱 WhatsApp
+        </button>` : '';
+    
+    // ✅ Permission-based edit button
+    let editButtonHTML = '';
+    if (isLoggedIn && authService.canEditListing(listing)) {
+        editButtonHTML = `<button class="edit-btn" onclick="event.stopPropagation(); editListing('${listing.id}')">✏️ Düzenle</button>`;
+    }
+    
+    div.innerHTML = `
+        <img src="${listing.image || 'https://via.placeholder.com/250x200/667eea/ffffff?text=Resim+Yok'}" 
+             alt="${listing.title}" class="listing-image" loading="lazy">
+        <div class="listing-details">
+            <h3 class="listing-title">${listing.title}</h3>
+            <div class="listing-advisor">👤 ${listing.advisor}</div>
+            <div class="listing-type-usage">
+                <span class="listing-type">${getDisplayText(listing.portfolioType)}</span>
+                <span class="listing-usage">${getDisplayText(listing.usagePurpose)}</span>
+            </div>
+            <div class="listing-location">
+                📍 ${listing.city}, ${listing.district}, ${listing.neighborhood}
+            </div>
+            <div class="listing-price">
+                💰 ${formatPrice(listing.price)} TL
+            </div>
+            <div class="listing-actions">
+                ${whatsappBtn}
+                ${editButtonHTML}
+            </div>
+        </div>
+    `;
+    
+    return div;
+}
+
+        // WhatsApp açma
+        window.openWhatsApp = function(phone, title, price) {
+            const message = `Merhaba! "${title}" ilanı hakkında bilgi almak istiyorum. (Fiyat: ${formatPrice(price)} TL)`;
+            const whatsappUrl = authService.createWhatsAppLink(phone, message);
+            window.open(whatsappUrl, '_blank');
+        };
+
+        // Edit listing
+        window.editListing = function(listingId) {
+            if (!isLoggedIn) {
+                showError('İlan düzenlemek için giriş yapmanız gerekiyor.');
+                return;
+            }
+            window.location.href = `ilan-duzenle.html?id=${listingId}`;
+        };
+
+        // View details
+        function viewListingDetails(listingId) {
+            window.location.href = `ilan-detay.html?id=${listingId}`;
+        }
+
+        // Update listing count
+        function updateListingCount(listingsToShow) {
+            if (listingCount) {
+                listingCount.textContent = `${listingsToShow.length} ilan bulundu`;
+            }
+        }
+
+        // Utility functions
+        function getDisplayText(value) {
+            const displayTexts = {
+                'MUSTAKİL BİNA': 'Mustakil Bina',
+                'BİNA KATI VEYA BÖLÜMÜ': 'Bina Katı',
+                'DÜKKAN-MAĞAZA': 'Dükkan',
+                'ARSA': 'Arsa',
+                'TARLA': 'Tarla',
+                'HİZMET OFİS': 'Ofis',
+                'EĞİTİM': 'Eğitim',
+                'SAĞLIK': 'Sağlık',
+                'TURİZM': 'Turizm',
+                'PERAKENDE': 'Perakende',
+                'GIDA': 'Gıda',
+                'SANAYİ-İMALAT': 'Sanayi',
+                'LOJİSTİK': 'Lojistik',
+                'YURT': 'Yurt',
+                'YATIRIM': 'Yatırım'
+            };
+            return displayTexts[value] || value;
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('tr-TR').format(price);
+        }
+
+        // Loading functions
+        function showLoading(message = 'Yükleniyor...') {
+            if (listingCount) listingCount.textContent = message;
+        }
+
+        function hideLoading() {
+            // Loading handled by listing count update
+        }
+
+        function hideAppLoading() {
+            if (appLoading) appLoading.style.display = 'none';
+            if (mainContainer) mainContainer.style.display = 'flex';
+        }
+
+        function showNoResults() {
+            if (listingsContainer) listingsContainer.style.display = 'none';
+            if (noResults) noResults.style.display = 'block';
+        }
+
+        function hideNoResults() {
+            if (noResults) noResults.style.display = 'none';
+            if (listingsContainer) listingsContainer.style.display = 'grid';
+        }
+
+        // Message functions
+        function showError(message) {
+            alert('❌ Hata: ' + message);
+        }
+
+        function showSuccessMessage(message) {
+            // Modern toast notification olacak
+            console.log('✅ ' + message);
+        }
+
+    </script>
+
+    <style>
+        /* Firebase specific styles */
+        .app-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-content .spinner {
+            border-color: rgba(255,255,255,0.3);
+            border-top-color: white;
+            margin: 0 auto 20px;
+        }
+
+        .user-photo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        .listing-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+    </style>
 </body>
 </html>
