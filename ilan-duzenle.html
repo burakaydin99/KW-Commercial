@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İlan Düzenle - KW Commercial</title>
+    <script src="shared-data.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="ilan-duzenle.css">
 </head>
@@ -42,8 +43,10 @@
     <!-- Edit Form Container -->
     <div class="form-container" id="editContainer" style="display: none;">
         <div class="form-header">
-            <h2>İlan Düzenle</h2>
-            <p>Ticari gayrimenkul ilanınızın detaylarını güncelleyiniz</p>
+            <div>
+                <h2>İlan Düzenle</h2>
+                <p>Ticari gayrimenkul ilanınızın detaylarını güncelleyiniz</p>
+            </div>
             <button class="back-btn" onclick="goBack()">← Geri Dön</button>
         </div>
 
@@ -178,6 +181,7 @@
                 </div>
             </div>
 
+            <!-- Açıklama Bölümü -->
             <div class="form-section">
                 <h3>Açıklama</h3>
                 
@@ -190,20 +194,27 @@
                 </div>
             </div>
 
+            <!-- Form Actions -->
             <div class="form-actions">
-                <button type="button" class="cancel-btn" onclick="goBack()">
-                    İptal
-                </button>
                 <button type="button" class="delete-btn" id="deleteBtn">
                     🗑️ İlanı Sil
                 </button>
+                <button type="button" class="cancel-btn" onclick="goBack()">
+                    İptal
+                </button>
                 <button type="submit" class="submit-btn">
-                    ✅ Değişiklikleri Kaydet
+                    💾 Değişiklikleri Kaydet
                 </button>
             </div>
         </form>
     </div>
 
+    <!-- Saving Indicator -->
+    <div class="saving-indicator" id="savingIndicator" style="display: none;">
+        Kaydediliyor...
+    </div>
+
+    <!-- Script dosyasını en sona taşıyın -->
     <script src="ilan-duzenle.js"></script>
 </body>
 </html>

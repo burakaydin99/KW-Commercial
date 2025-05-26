@@ -1,4 +1,6 @@
-// Location data (same as main page)
+// add-listing.js - Yeni ilan ekleme sayfası için
+
+// Location data
 const locationData = {
     "İstanbul": {
         "Şişli": ["Mecidiyeköy", "Levent", "Gayrettepe"],
@@ -39,12 +41,13 @@ const listingImageInput = document.getElementById('listingImage');
 const imagePreview = document.getElementById('imagePreview');
 const previewImg = document.getElementById('previewImg');
 
-// Authentication state - using session storage
+// Authentication state
 let isLoggedIn = false;
 let currentUser = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Add listing page loaded');
     initializeAuth();
     setupEventListeners();
     setupLocationSelects();
@@ -53,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Authentication functions
 function initializeAuth() {
-    // Check if user is already logged in using sessionStorage
     if (sessionStorage.getItem('mockLoggedIn') === 'true') {
         currentUser = {
             name: 'John Doe',
@@ -62,6 +64,9 @@ function initializeAuth() {
         };
         isLoggedIn = true;
         showUserInfo();
+        console.log('User logged in for adding listing');
+    } else {
+        console.log('User not logged in for adding listing');
     }
 }
 
@@ -77,7 +82,6 @@ function hideUserInfo() {
 }
 
 function mockLogin() {
-    // Simulate Google login
     const mockUser = {
         name: 'John Doe',
         email: 'john.doe@example.com',
@@ -119,7 +123,6 @@ function setupEventListeners() {
 
 // Location setup
 function setupLocationSelects() {
-    // City select is already populated in HTML
     updateDistrictOptions();
 }
 
@@ -195,6 +198,7 @@ function removeImage() {
 // Form submission
 function handleFormSubmit(event) {
     event.preventDefault();
+    console.log('New listing form submitted');
     
     // Check if user is logged in
     if (!isLoggedIn) {
@@ -224,6 +228,8 @@ function handleFormSubmit(event) {
         description: formData.get('description') || '',
         image: previewImg.src || null
     };
+    
+    console.log('New listing data:', listingData);
     
     // Save listing
     saveListing(listingData);
@@ -263,14 +269,17 @@ function validateForm() {
     return true;
 }
 
-// Save listing (using in-memory storage for demo)
+// ✅ Save listing using shared storage
 function saveListing(listingData) {
     try {
+        // ✅ Shared storage'a kaydet
+        const newListing = addSharedListing(listingData);
+        
         // Show success message
-        alert('İlan başarıyla eklendi! (Demo modunda)');
+        alert('İlan başarıyla eklendi!');
         
         // Log the data for demo purposes
-        console.log('New listing data:', listingData);
+        console.log('New listing saved:', newListing);
         
         // Reset form
         resetForm();
@@ -296,11 +305,10 @@ function resetForm() {
     setCurrentDate();
 }
 
-// Price formatting (add thousand separators as user types)
+// Price formatting
 document.getElementById('price').addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    let value = e.target.value.replace(/\D/g, '');
     if (value) {
-        // Add thousand separators for display (but keep actual value as number)
         const formatted = new Intl.NumberFormat('tr-TR').format(parseInt(value));
         // Don't update the input value to avoid cursor jumping
     }

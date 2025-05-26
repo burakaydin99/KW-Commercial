@@ -1,150 +1,7 @@
-// Mock data for listings (updated with createdBy fields)
-const listings = [
-    {
-        id: 1,
-        title: "Merkezi Konumda Satılık Ofis",
-        image: "https://media.istockphoto.com/id/182188795/tr/foto%C4%9Fraf/modern-office-building-exterior.jpg?s=612x612&w=is&k=20&c=PXNc2xNZXbCvoNTaPnX9NJcUgvbUU0tckENXDENMvW0=",
-        advisor: "Ahmet Yılmaz",
-        portfolioType: "BİNA KATI VEYA BÖLÜMÜ",
-        usagePurpose: "HİZMET OFİS",
-        city: "İstanbul",
-        district: "Şişli",
-        neighborhood: "Mecidiyeköy",
-        price: 2500000,
-        date: "2024-01-15",
-        description: "Merkezi konumda modern ofis alanı. Metro istasyonuna 5 dakika yürüme mesafesinde. 150 m² kullanım alanı, 2 toplantı odası, açık ofis alanı ve mutfak bulunmaktadır. Bina yeni yapılmış olup, tüm modern imkanlar mevcuttur.",
-        islandParcel: "Ada: 123, Parsel: 45",
-        zoningStatus: "Ticari",
-        createdBy: "123456789",
-        createdAt: "2024-01-15T10:00:00.000Z"
-    },
-    {
-        id: 2,
-        title: "Cadde Üzeri Kiralık Dükkan",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPWGq950txuigG7DfO6bMtCg2X13S5uH5N0A&s",
-        advisor: "Fatma Demir",
-        portfolioType: "DÜKKAN-MAĞAZA",
-        usagePurpose: "PERAKENDE",
-        city: "İstanbul",
-        district: "Kadıköy",
-        neighborhood: "Moda",
-        price: 15000,
-        date: "2024-01-10",
-        description: "Ana cadde üzerinde kiralık dükkan. Yoğun pedestrian trafiği bulunan lokasyon. 80 m² kapalı alan, geniş vitrin alanı. Perakende satış için ideal konumdadır.",
-        islandParcel: "Ada: 456, Parsel: 78",
-        zoningStatus: "Ticari",
-        createdBy: "987654321",
-        createdAt: "2024-01-10T14:30:00.000Z"
-    },
-    {
-        id: 3,
-        title: "Sanayi Alanında Satılık Arsa",
-        image: "https://www.katilimevim.com.tr/wp-content/uploads/shutterstock_2229665975-min-580x350.jpg",
-        advisor: "Mehmet Kaya",
-        portfolioType: "ARSA",
-        usagePurpose: "SANAYİ-İMALAT",
-        city: "Bursa",
-        district: "Osmangazi",
-        neighborhood: "Organize Sanayi",
-        price: 5000000,
-        date: "2024-01-08",
-        description: "Organize sanayi bölgesinde imar izinli arsa. Toplam 2500 m² alan. Elektrik, su, doğalgaz altyapısı mevcut. Fabrika inşaatı için uygun zemin etüdü yapılmıştır.",
-        islandParcel: "Ada: 789, Parsel: 12",
-        zoningStatus: "Sanayi",
-        createdBy: "456789123",
-        createdAt: "2024-01-08T09:15:00.000Z"
-    },
-    {
-        id: 4,
-        title: "Ana Cadde Üzeri Kiralık Dükkan",
-        image: "https://www.maveraprojeleri.com/uploads/637458.jpg",
-        advisor: "Fatma Demir",
-        portfolioType: "DÜKKAN-MAĞAZA",
-        usagePurpose: "PERAKENDE",
-        city: "İstanbul",
-        district: "Kadıköy",
-        neighborhood: "Bağdat Caddesi",
-        price: 25000,
-        date: "2024-01-12",
-        description: "Yoğun geçiş trafiği olan ana cadde üzerinde kiralık dükkan. Premium lokasyon, yüksek görünürlük. 120 m² alan, geniş depo imkanı.",
-        islandParcel: "Ada: 321, Parsel: 54",
-        zoningStatus: "Ticari",
-        createdBy: "123456789",
-        createdAt: "2024-01-12T16:45:00.000Z"
-    },
-    {
-        id: 5,
-        title: "Sanayi Alanında Satılık Fabrika Binası",
-        image: "https://media.istockphoto.com/id/1365029556/tr/foto%C4%9Fraf/interior-of-metalworking-factory-workshop-hangar-modern-industrial-enterprise-production.jpg?s=612x612&w=0&k=20&c=Qqe95Tt7QNKmmDPqsFDXsTxp1pkw1FcDIWzqfgiTO3U=",
-        advisor: "Mehmet Kaya",
-        portfolioType: "MUSTAKİL BİNA",
-        usagePurpose: "SANAYİ-İMALAT",
-        city: "Bursa",
-        district: "Osmangazi",
-        neighborhood: "Organize Sanayi Bölgesi",
-        price: 8500000,
-        date: "2024-01-08",
-        description: "Organize sanayi bölgesinde tam donanımlı fabrika binası. 3000 m² kapalı alan, vinç sistemi mevcut, yükleme rampaları.",
-        islandParcel: "Ada: 654, Parsel: 87",
-        zoningStatus: "Sanayi",
-        createdBy: "456789123",
-        createdAt: "2024-01-08T11:20:00.000Z"
-    },
-    {
-        id: 6,
-        title: "Deniz Manzaralı Otel Projesi",
-        image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/db/cb/76/levent-otel-dis-cephesi.jpg?w=900&h=500&s=1",
-        advisor: "Ayşe Çelik",
-        portfolioType: "MUSTAKİL BİNA",
-        usagePurpose: "TURİZM",
-        city: "Antalya",
-        district: "Muratpaşa",
-        neighborhood: "Lara",
-        price: 15000000,
-        date: "2024-01-05",
-        description: "Denize sıfır konumda 4 yıldızlı otel projesi. 50 odalı otel konsepti, havuz ve spa alanı planlaması mevcut.",
-        islandParcel: "Ada: 111, Parsel: 22",
-        zoningStatus: "Turizm",
-        createdBy: "789123456",
-        createdAt: "2024-01-05T13:10:00.000Z"
-    },
-    {
-        id: 7,
-        title: "Merkezi Konumda Eğitim Kurumu Binası",
-        image: "https://www.baskentosb.org/_uploads/2021041908113143.jpg",
-        advisor: "Mustafa Özkan",
-        portfolioType: "BİNA KATI VEYA BÖLÜMÜ",
-        usagePurpose: "EĞİTİM",
-        city: "Ankara",
-        district: "Çankaya",
-        neighborhood: "Kızılay",
-        price: 35000,
-        date: "2024-01-03",
-        description: "Merkezi konumda eğitim kurumu için uygun geniş alan. 500 m² alan, 8 derslik kapasitesi, laboratuvar imkanı.",
-        islandParcel: "Ada: 333, Parsel: 44",
-        zoningStatus: "Eğitim",
-        createdBy: "321654987",
-        createdAt: "2024-01-03T08:30:00.000Z"
-    },
-    {
-        id: 8,
-        title: "Hastane Yakını Sağlık Merkezi",
-        image: "https://saglik.ibb.istanbul/wp-content/uploads/2022/10/ESENYURT-2-705x446.jpg",
-        advisor: "Dr. Zeynep Arslan",
-        portfolioType: "BİNA KATI VEYA BÖLÜMÜ",
-        usagePurpose: "SAĞLIK",
-        city: "İzmir",
-        district: "Konak",
-        neighborhood: "Alsancak",
-        price: 28000,
-        date: "2024-01-01",
-        description: "Hastane ve üniversite yakınında sağlık merkezi için ideal konum. Modern tıbbi cihaz altyapısı mevcut.",
-        islandParcel: "Ada: 555, Parsel: 66",
-        zoningStatus: "Sağlık",
-        createdBy: "654987321",
-        createdAt: "2024-01-01T15:45:00.000Z"
-    }
-];
+// ilan-detay.js - İlan detay sayfası için
+
+// ✅ Değişken çakışmasını önlemek için farklı isim kullan
+let detailListings = [];
 
 // DOM elements
 const loginBtn = document.getElementById('loginBtn');
@@ -162,11 +19,28 @@ let currentListing = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing...');
+    console.log('Detail page DOM loaded, initializing...');
+    
+    // ✅ Güvenli şekilde veri yükle
+    loadDetailData();
+    
     initializeAuth();
     setupEventListeners();
     loadListingDetail();
 });
+
+// ✅ Veri yükleme fonksiyonu
+function loadDetailData() {
+    try {
+        // Shared data'dan veri al
+        detailListings = getSharedListings();
+        console.log('Detail listings loaded successfully:', detailListings.length);
+    } catch (error) {
+        console.error('Error loading detail listings:', error);
+        // Fallback: boş array
+        detailListings = [];
+    }
+}
 
 // Authentication functions
 function initializeAuth() {
@@ -185,14 +59,14 @@ function initializeAuth() {
 }
 
 function showUserInfo() {
-    loginBtn.style.display = 'none';
-    userInfo.style.display = 'flex';
-    userName.textContent = currentUser.name;
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'flex';
+    if (userName) userName.textContent = currentUser.name;
 }
 
 function hideUserInfo() {
-    loginBtn.style.display = 'block';
-    userInfo.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'block';
+    if (userInfo) userInfo.style.display = 'none';
 }
 
 function mockLogin() {
@@ -209,7 +83,7 @@ function mockLogin() {
     
     alert('Giriş başarılı! (Mock Login)');
     
-    // Update edit button visibility immediately
+    // ✅ Edit butonunu göstermek için
     setupEditButton();
 }
 
@@ -229,27 +103,30 @@ function logout() {
 
 // Event listeners
 function setupEventListeners() {
-    loginBtn.addEventListener('click', mockLogin);
-    logoutBtn.addEventListener('click', logout);
+    if (loginBtn) loginBtn.addEventListener('click', mockLogin);
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
     
     // Contact button event
-    document.querySelector('.contact-btn').addEventListener('click', function() {
-        if (!currentListing) return;
-        
-        const advisor = currentListing.advisor;
-        const title = currentListing.title;
-        const price = formatPrice(currentListing.price);
-        
-        const message = `Merhaba ${advisor}, "${title}" ilanı hakkında bilgi almak istiyorum. (Fiyat: ${price} TL)`;
-        
-        // Try to open WhatsApp if on mobile, otherwise show contact info
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        } else {
-            alert(`Danışman İletişim Bilgileri:\n\n${advisor}\n\nMesaj: ${message}\n\nWhatsApp veya telefon ile iletişime geçebilirsiniz.`);
-        }
-    });
+    const contactBtn = document.querySelector('.contact-btn');
+    if (contactBtn) {
+        contactBtn.addEventListener('click', function() {
+            if (!currentListing) return;
+            
+            const advisor = currentListing.advisor;
+            const title = currentListing.title;
+            const price = formatPrice(currentListing.price);
+            
+            const message = `Merhaba ${advisor}, "${title}" ilanı hakkında bilgi almak istiyorum. (Fiyat: ${price} TL)`;
+            
+            // Try to open WhatsApp if on mobile, otherwise show contact info
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            } else {
+                alert(`Danışman İletişim Bilgileri:\n\n${advisor}\n\nMesaj: ${message}\n\nWhatsApp veya telefon ile iletişime geçebilirsiniz.`);
+            }
+        });
+    }
 }
 
 // Get listing ID from URL
@@ -270,7 +147,9 @@ function loadListingDetail() {
 
     // Simulate loading delay
     setTimeout(() => {
-        const listing = listings.find(l => l.id === listingId);
+        // ✅ Güncel veriyi al
+        detailListings = getSharedListings();
+        const listing = detailListings.find(l => l.id === listingId);
         console.log('Found listing:', listing);
         
         if (!listing) {
@@ -328,16 +207,16 @@ function setupEditButton() {
 
 // Show error message
 function showError() {
-    loadingSpinner.style.display = 'none';
-    errorMessage.style.display = 'block';
-    detailContainer.style.display = 'none';
+    if (loadingSpinner) loadingSpinner.style.display = 'none';
+    if (errorMessage) errorMessage.style.display = 'block';
+    if (detailContainer) detailContainer.style.display = 'none';
 }
 
 // Show detail container
 function showDetail() {
-    loadingSpinner.style.display = 'none';
-    errorMessage.style.display = 'none';
-    detailContainer.style.display = 'block';
+    if (loadingSpinner) loadingSpinner.style.display = 'none';
+    if (errorMessage) errorMessage.style.display = 'none';
+    if (detailContainer) detailContainer.style.display = 'block';
     checkFavoriteStatus();
 }
 
@@ -347,31 +226,55 @@ function populateListingDetail(listing) {
     document.title = `${listing.title} - KW Commercial`;
 
     // Main image
-    document.getElementById('listingMainImage').src = listing.image;
-    document.getElementById('listingMainImage').alt = listing.title;
+    const mainImage = document.getElementById('listingMainImage');
+    if (mainImage) {
+        mainImage.src = listing.image;
+        mainImage.alt = listing.title;
+    }
 
     // Header
-    document.getElementById('listingTitle').textContent = listing.title;
-    document.getElementById('listingPrice').textContent = formatPrice(listing.price) + ' TL';
+    const titleElement = document.getElementById('listingTitle');
+    if (titleElement) titleElement.textContent = listing.title;
+    
+    const priceElement = document.getElementById('listingPrice');
+    if (priceElement) priceElement.textContent = formatPrice(listing.price) + ' TL';
 
     // Basic info
-    document.getElementById('listingDate').textContent = formatDate(listing.date);
-    document.getElementById('listingAdvisor').textContent = listing.advisor;
-    document.getElementById('portfolioType').textContent = getDisplayText(listing.portfolioType);
-    document.getElementById('usagePurpose').textContent = getDisplayText(listing.usagePurpose);
+    const dateElement = document.getElementById('listingDate');
+    if (dateElement) dateElement.textContent = formatDate(listing.date);
+    
+    const advisorElement = document.getElementById('listingAdvisor');
+    if (advisorElement) advisorElement.textContent = listing.advisor;
+    
+    const portfolioElement = document.getElementById('portfolioType');
+    if (portfolioElement) portfolioElement.textContent = getDisplayText(listing.portfolioType);
+    
+    const usageElement = document.getElementById('usagePurpose');
+    if (usageElement) usageElement.textContent = getDisplayText(listing.usagePurpose);
 
     // Location info
-    document.getElementById('listingCity').textContent = listing.city;
-    document.getElementById('listingDistrict').textContent = listing.district;
-    document.getElementById('listingNeighborhood').textContent = listing.neighborhood;
-    document.getElementById('islandParcel').textContent = listing.islandParcel || 'Belirtilmemiş';
-    document.getElementById('zoningStatus').textContent = listing.zoningStatus || 'Belirtilmemiş';
+    const cityElement = document.getElementById('listingCity');
+    if (cityElement) cityElement.textContent = listing.city;
+    
+    const districtElement = document.getElementById('listingDistrict');
+    if (districtElement) districtElement.textContent = listing.district;
+    
+    const neighborhoodElement = document.getElementById('listingNeighborhood');
+    if (neighborhoodElement) neighborhoodElement.textContent = listing.neighborhood;
+    
+    const islandElement = document.getElementById('islandParcel');
+    if (islandElement) islandElement.textContent = listing.islandParcel || 'Belirtilmemiş';
+    
+    const zoningElement = document.getElementById('zoningStatus');
+    if (zoningElement) zoningElement.textContent = listing.zoningStatus || 'Belirtilmemiş';
 
     // Price (duplicate for emphasis)
-    document.getElementById('detailPrice').textContent = formatPrice(listing.price) + ' TL';
+    const detailPriceElement = document.getElementById('detailPrice');
+    if (detailPriceElement) detailPriceElement.textContent = formatPrice(listing.price) + ' TL';
 
     // Description
-    document.getElementById('listingDescription').textContent = listing.description || 'Açıklama bulunmuyor.';
+    const descriptionElement = document.getElementById('listingDescription');
+    if (descriptionElement) descriptionElement.textContent = listing.description || 'Açıklama bulunmuyor.';
 }
 
 // Utility functions
@@ -486,6 +389,8 @@ function toggleFavorite() {
     if (!currentListing) return;
 
     const favoriteBtn = document.querySelector('.favorite-btn');
+    if (!favoriteBtn) return;
+    
     let favorites = JSON.parse(sessionStorage.getItem('favorites') || '[]');
     
     const isFavorite = favorites.includes(currentListing.id);
@@ -515,7 +420,7 @@ function checkFavoriteStatus() {
     const favorites = JSON.parse(sessionStorage.getItem('favorites') || '[]');
     const favoriteBtn = document.querySelector('.favorite-btn');
     
-    if (favorites.includes(currentListing.id)) {
+    if (favoriteBtn && favorites.includes(currentListing.id)) {
         favoriteBtn.textContent = '❤️ Favorilerde';
         favoriteBtn.classList.add('active');
     }
@@ -539,3 +444,8 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+// Make functions globally available for HTML onclick handlers
+window.goBack = goBack;
+window.shareProperty = shareProperty;
+window.toggleFavorite = toggleFavorite;

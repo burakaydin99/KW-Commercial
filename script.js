@@ -1,150 +1,7 @@
-// Mock data for listings - Extended to 1000+ listings for performance test
-let listings = [
-    {
-        id: 1,
-        title: "Merkezi Konumda Satılık Ofis",
-        image: "https://media.istockphoto.com/id/182188795/tr/foto%C4%9Fraf/modern-office-building-exterior.jpg?s=612x612&w=is&k=20&c=PXNc2xNZXbCvoNTaPnX9NJcUgvbUU0tckENXDENMvW0=",
-        advisor: "Ahmet Yılmaz",
-        portfolioType: "BİNA KATI VEYA BÖLÜMÜ",
-        usagePurpose: "HİZMET OFİS",
-        city: "İstanbul",
-        district: "Şişli",
-        neighborhood: "Mecidiyeköy",
-        price: 2500000,
-        date: "2024-01-15",
-        description: "Merkezi konumda modern ofis alanı. Metro istasyonuna 5 dakika yürüme mesafesinde. 150 m² kullanım alanı, 2 toplantı odası, açık ofis alanı ve mutfak bulunmaktadır. Bina yeni yapılmış olup, tüm modern imkanlar mevcuttur.",
-        islandParcel: "Ada: 123, Parsel: 45",
-        zoningStatus: "Ticari",
-        createdBy: "123456789",
-        createdAt: "2024-01-15T10:00:00.000Z"
-    },
-    {
-        id: 2,
-        title: "Cadde Üzeri Kiralık Dükkan",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPWGq950txuigG7DfO6bMtCg2X13S5uH5N0A&s",
-        advisor: "Fatma Demir",
-        portfolioType: "DÜKKAN-MAĞAZA",
-        usagePurpose: "PERAKENDE",
-        city: "İstanbul",
-        district: "Kadıköy",
-        neighborhood: "Moda",
-        price: 15000,
-        date: "2024-01-10",
-        description: "Ana cadde üzerinde kiralık dükkan. Yoğun pedestrian trafiği bulunan lokasyon. 80 m² kapalı alan, geniş vitrin alanı. Perakende satış için ideal konumdadır.",
-        islandParcel: "Ada: 456, Parsel: 78",
-        zoningStatus: "Ticari",
-        createdBy: "987654321",
-        createdAt: "2024-01-10T14:30:00.000Z"
-    },
-    {
-        id: 3,
-        title: "Sanayi Alanında Satılık Arsa",
-        image: "https://www.katilimevim.com.tr/wp-content/uploads/shutterstock_2229665975-min-580x350.jpg",
-        advisor: "Mehmet Kaya",
-        portfolioType: "ARSA",
-        usagePurpose: "SANAYİ-İMALAT",
-        city: "Bursa",
-        district: "Osmangazi",
-        neighborhood: "Organize Sanayi",
-        price: 5000000,
-        date: "2024-01-08",
-        description: "Organize sanayi bölgesinde imar izinli arsa. Toplam 2500 m² alan. Elektrik, su, doğalgaz altyapısı mevcut. Fabrika inşaatı için uygun zemin etüdü yapılmıştır.",
-        islandParcel: "Ada: 789, Parsel: 12",
-        zoningStatus: "Sanayi",
-        createdBy: "456789123",
-        createdAt: "2024-01-08T09:15:00.000Z"
-    },
-    {
-        id: 4,
-        title: "Ana Cadde Üzeri Kiralık Dükkan",
-        image: "https://www.maveraprojeleri.com/uploads/637458.jpg",
-        advisor: "Fatma Demir",
-        portfolioType: "DÜKKAN-MAĞAZA",
-        usagePurpose: "PERAKENDE",
-        city: "İstanbul",
-        district: "Kadıköy",
-        neighborhood: "Bağdat Caddesi",
-        price: 25000,
-        date: "2024-01-12",
-        description: "Yoğun geçiş trafiği olan ana cadde üzerinde kiralık dükkan. Premium lokasyon, yüksek görünürlük. 120 m² alan, geniş depo imkanı.",
-        islandParcel: "Ada: 321, Parsel: 54",
-        zoningStatus: "Ticari",
-        createdBy: "123456789",
-        createdAt: "2024-01-12T16:45:00.000Z"
-    },
-    {
-        id: 5,
-        title: "Sanayi Alanında Satılık Fabrika Binası",
-        image: "https://media.istockphoto.com/id/1365029556/tr/foto%C4%9Fraf/interior-of-metalworking-factory-workshop-hangar-modern-industrial-enterprise-production.jpg?s=612x612&w=0&k=20&c=Qqe95Tt7QNKmmDPqsFDXsTxp1pkw1FcDIWzqfgiTO3U=",
-        advisor: "Mehmet Kaya",
-        portfolioType: "MUSTAKİL BİNA",
-        usagePurpose: "SANAYİ-İMALAT",
-        city: "Bursa",
-        district: "Osmangazi",
-        neighborhood: "Organize Sanayi Bölgesi",
-        price: 8500000,
-        date: "2024-01-08",
-        description: "Organize sanayi bölgesinde tam donanımlı fabrika binası. 3000 m² kapalı alan, vinç sistemi mevcut, yükleme rampaları.",
-        islandParcel: "Ada: 654, Parsel: 87",
-        zoningStatus: "Sanayi",
-        createdBy: "456789123",
-        createdAt: "2024-01-08T11:20:00.000Z"
-    },
-    {
-        id: 6,
-        title: "Deniz Manzaralı Otel Projesi",
-        image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/db/cb/76/levent-otel-dis-cephesi.jpg?w=900&h=500&s=1",
-        advisor: "Ayşe Çelik",
-        portfolioType: "MUSTAKİL BİNA",
-        usagePurpose: "TURİZM",
-        city: "Antalya",
-        district: "Muratpaşa",
-        neighborhood: "Lara",
-        price: 15000000,
-        date: "2024-01-05",
-        description: "Denize sıfır konumda 4 yıldızlı otel projesi. 50 odalı otel konsepti, havuz ve spa alanı planlaması mevcut.",
-        islandParcel: "Ada: 111, Parsel: 22",
-        zoningStatus: "Turizm",
-        createdBy: "789123456",
-        createdAt: "2024-01-05T13:10:00.000Z"
-    },
-    {
-        id: 7,
-        title: "Merkezi Konumda Eğitim Kurumu Binası",
-        image: "https://www.baskentosb.org/_uploads/2021041908113143.jpg",
-        advisor: "Mustafa Özkan",
-        portfolioType: "BİNA KATI VEYA BÖLÜMÜ",
-        usagePurpose: "EĞİTİM",
-        city: "Ankara",
-        district: "Çankaya",
-        neighborhood: "Kızılay",
-        price: 35000,
-        date: "2024-01-03",
-        description: "Merkezi konumda eğitim kurumu için uygun geniş alan. 500 m² alan, 8 derslik kapasitesi, laboratuvar imkanı.",
-        islandParcel: "Ada: 333, Parsel: 44",
-        zoningStatus: "Eğitim",
-        createdBy: "321654987",
-        createdAt: "2024-01-03T08:30:00.000Z"
-    },
-    {
-        id: 8,
-        title: "Hastane Yakını Sağlık Merkezi",
-        image: "https://saglik.ibb.istanbul/wp-content/uploads/2022/10/ESENYURT-2-705x446.jpg",
-        advisor: "Dr. Zeynep Arslan",
-        portfolioType: "BİNA KATI VEYA BÖLÜMÜ",
-        usagePurpose: "SAĞLIK",
-        city: "İzmir",
-        district: "Konak",
-        neighborhood: "Alsancak",
-        price: 28000,
-        date: "2024-01-01",
-        description: "Hastane ve üniversite yakınında sağlık merkezi için ideal konum. Modern tıbbi cihaz altyapısı mevcut.",
-        islandParcel: "Ada: 555, Parsel: 66",
-        zoningStatus: "Sağlık",
-        createdBy: "654987321",
-        createdAt: "2024-01-01T15:45:00.000Z"
-    }
-];
+// script.js - Ana sayfa için
+
+// ✅ Değişken çakışmasını önlemek için farklı isim kullan
+let allListings = [];
 
 // Location data
 const locationData = {
@@ -193,23 +50,43 @@ const minBudget = document.getElementById('minBudget');
 const maxBudget = document.getElementById('maxBudget');
 const clearFiltersBtn = document.querySelector('.clear-filters-btn');
 
-// Authentication state - using session storage for persistence
+// Authentication state
 let isLoggedIn = false;
 let currentUser = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Main page DOM loaded');
+    
+    // ✅ Güvenli şekilde veri yükle
+    loadListingsData();
+    
     initializeAuth();
     setupEventListeners();
     setupLocationFilters();
-    displayListings(listings);
-    updateListingCount(listings);
 });
+
+// ✅ Veri yükleme fonksiyonu
+function loadListingsData() {
+    try {
+        // Shared data'dan veri al
+        allListings = getSharedListings();
+        console.log('Listings loaded successfully:', allListings.length);
+        
+        // Listings'i göster
+        displayListings(allListings);
+        updateListingCount(allListings);
+    } catch (error) {
+        console.error('Error loading listings:', error);
+        // Fallback: boş array
+        allListings = [];
+        displayListings(allListings);
+        updateListingCount(allListings);
+    }
+}
 
 // Authentication functions
 function initializeAuth() {
-    // Check session storage for login state
     if (sessionStorage.getItem('mockLoggedIn') === 'true') {
         currentUser = {
             name: 'John Doe',
@@ -225,17 +102,16 @@ function initializeAuth() {
 }
 
 function showUserInfo() {
-    loginBtn.style.display = 'none';
-    userInfo.style.display = 'flex';
-    userName.textContent = currentUser.name;
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'flex';
+    if (userName) userName.textContent = currentUser.name;
 }
 
 function hideUserInfo() {
-    loginBtn.style.display = 'block';
-    userInfo.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'block';
+    if (userInfo) userInfo.style.display = 'none';
 }
 
-// Mock login function
 function mockLogin() {
     const mockUser = {
         name: 'John Doe',
@@ -250,8 +126,8 @@ function mockLogin() {
     
     alert('Giriş başarılı! (Mock Login)');
     
-    // Refresh listings to show edit buttons
-    displayListings(listings);
+    // ✅ Edit butonlarını göstermek için listings'i yeniden render et
+    displayListings(allListings);
 }
 
 function logout() {
@@ -261,29 +137,29 @@ function logout() {
     hideUserInfo();
     alert('Çıkış yapıldı!');
     
-    // Refresh listings to hide edit buttons
-    displayListings(listings);
+    // Edit butonlarını gizlemek için listings'i yeniden render et
+    displayListings(allListings);
 }
 
 // Event listeners
 function setupEventListeners() {
     // Auth events
-    loginBtn.addEventListener('click', mockLogin);
-    logoutBtn.addEventListener('click', logout);
+    if (loginBtn) loginBtn.addEventListener('click', mockLogin);
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
     
     // Filter events with debounce for performance
-    searchInput.addEventListener('input', debounce(applyFilters, 300));
-    dateFilter.addEventListener('change', applyFilters);
-    advisorFilter.addEventListener('input', debounce(applyFilters, 300));
-    portfolioTypeFilter.addEventListener('change', applyFilters);
-    usagePurposeFilter.addEventListener('change', applyFilters);
-    cityFilter.addEventListener('change', applyFilters);
-    districtFilter.addEventListener('change', applyFilters);
-    minBudget.addEventListener('input', debounce(applyFilters, 500));
-    maxBudget.addEventListener('input', debounce(applyFilters, 500));
+    if (searchInput) searchInput.addEventListener('input', debounce(applyFilters, 300));
+    if (dateFilter) dateFilter.addEventListener('change', applyFilters);
+    if (advisorFilter) advisorFilter.addEventListener('input', debounce(applyFilters, 300));
+    if (portfolioTypeFilter) portfolioTypeFilter.addEventListener('change', applyFilters);
+    if (usagePurposeFilter) usagePurposeFilter.addEventListener('change', applyFilters);
+    if (cityFilter) cityFilter.addEventListener('change', applyFilters);
+    if (districtFilter) districtFilter.addEventListener('change', applyFilters);
+    if (minBudget) minBudget.addEventListener('input', debounce(applyFilters, 500));
+    if (maxBudget) maxBudget.addEventListener('input', debounce(applyFilters, 500));
     
     // Clear filters
-    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', clearAllFilters);
 }
 
 // Debounce function for better performance
@@ -301,13 +177,17 @@ function debounce(func, wait) {
 
 // Location filter setup
 function setupLocationFilters() {
-    cityFilter.addEventListener('change', function() {
-        updateDistrictOptions();
-        applyFilters();
-    });
+    if (cityFilter) {
+        cityFilter.addEventListener('change', function() {
+            updateDistrictOptions();
+            applyFilters();
+        });
+    }
 }
 
 function updateDistrictOptions() {
+    if (!cityFilter || !districtFilter) return;
+    
     const selectedCity = cityFilter.value;
     districtFilter.innerHTML = '<option value="">Tümü</option>';
     
@@ -321,17 +201,19 @@ function updateDistrictOptions() {
     }
 }
 
-// Filtering functions - Optimized for large datasets
+// Filtering functions
 function applyFilters() {
     showLoading();
     
-    // Use setTimeout to prevent UI blocking on large datasets
     setTimeout(() => {
+        // ✅ Güncel veriyi al
+        allListings = getSharedListings();
+        
         const startTime = performance.now();
         const filteredListings = filterListings();
         const endTime = performance.now();
         
-        console.log(`Filtering ${listings.length} listings took ${endTime - startTime} milliseconds`);
+        console.log(`Filtering ${allListings.length} listings took ${endTime - startTime} milliseconds`);
         
         displayListings(filteredListings);
         updateListingCount(filteredListings);
@@ -340,42 +222,42 @@ function applyFilters() {
 }
 
 function filterListings() {
-    return listings.filter(listing => {
+    return allListings.filter(listing => {
         // Search filter
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         const matchesSearch = !searchTerm || 
             listing.title.toLowerCase().includes(searchTerm) ||
             listing.description.toLowerCase().includes(searchTerm) ||
             listing.advisor.toLowerCase().includes(searchTerm);
         
         // Date filter
-        const dateValue = dateFilter.value;
+        const dateValue = dateFilter ? dateFilter.value : '';
         const matchesDate = !dateValue || listing.date >= dateValue;
         
         // Advisor filter
-        const advisorValue = advisorFilter.value.toLowerCase();
+        const advisorValue = advisorFilter ? advisorFilter.value.toLowerCase() : '';
         const matchesAdvisor = !advisorValue || 
             listing.advisor.toLowerCase().includes(advisorValue);
         
         // Portfolio type filter
-        const portfolioValue = portfolioTypeFilter.value;
+        const portfolioValue = portfolioTypeFilter ? portfolioTypeFilter.value : '';
         const matchesPortfolio = !portfolioValue || listing.portfolioType === portfolioValue;
         
         // Usage purpose filter
-        const usageValue = usagePurposeFilter.value;
+        const usageValue = usagePurposeFilter ? usagePurposeFilter.value : '';
         const matchesUsage = !usageValue || listing.usagePurpose === usageValue;
         
         // City filter
-        const cityValue = cityFilter.value;
+        const cityValue = cityFilter ? cityFilter.value : '';
         const matchesCity = !cityValue || listing.city === cityValue;
         
         // District filter
-        const districtValue = districtFilter.value;
+        const districtValue = districtFilter ? districtFilter.value : '';
         const matchesDistrict = !districtValue || listing.district === districtValue;
         
         // Budget filter
-        const minBudgetValue = minBudget.value;
-        const maxBudgetValue = maxBudget.value;
+        const minBudgetValue = minBudget ? minBudget.value : '';
+        const maxBudgetValue = maxBudget ? maxBudget.value : '';
         const matchesBudget = (!minBudgetValue || listing.price >= parseInt(minBudgetValue)) &&
                               (!maxBudgetValue || listing.price <= parseInt(maxBudgetValue));
         
@@ -386,22 +268,24 @@ function filterListings() {
 }
 
 function clearAllFilters() {
-    searchInput.value = '';
-    dateFilter.value = '';
-    advisorFilter.value = '';
-    portfolioTypeFilter.value = '';
-    usagePurposeFilter.value = '';
-    cityFilter.value = '';
-    districtFilter.value = '';
-    minBudget.value = '';
-    maxBudget.value = '';
+    if (searchInput) searchInput.value = '';
+    if (dateFilter) dateFilter.value = '';
+    if (advisorFilter) advisorFilter.value = '';
+    if (portfolioTypeFilter) portfolioTypeFilter.value = '';
+    if (usagePurposeFilter) usagePurposeFilter.value = '';
+    if (cityFilter) cityFilter.value = '';
+    if (districtFilter) districtFilter.value = '';
+    if (minBudget) minBudget.value = '';
+    if (maxBudget) maxBudget.value = '';
     
     updateDistrictOptions();
     applyFilters();
 }
 
-// Display functions - Optimized for performance
+// Display functions
 function displayListings(listingsToShow) {
+    if (!listingsContainer) return;
+    
     if (listingsToShow.length === 0) {
         showNoResults();
         return;
@@ -409,7 +293,7 @@ function displayListings(listingsToShow) {
     
     hideNoResults();
     
-    // Use DocumentFragment for better performance with large lists
+    // Use DocumentFragment for better performance
     const fragment = document.createDocumentFragment();
     const startTime = performance.now();
     
@@ -459,27 +343,29 @@ function createListingElement(listing) {
 }
 
 function updateListingCount(listingsToShow) {
-    listingCount.textContent = `${listingsToShow.length} ilan bulundu`;
+    if (listingCount) {
+        listingCount.textContent = `${listingsToShow.length} ilan bulundu`;
+    }
 }
 
 function showLoading() {
-    loadingSpinner.style.display = 'block';
-    listingsContainer.style.display = 'none';
-    noResults.style.display = 'none';
+    if (loadingSpinner) loadingSpinner.style.display = 'block';
+    if (listingsContainer) listingsContainer.style.display = 'none';
+    if (noResults) noResults.style.display = 'none';
 }
 
 function hideLoading() {
-    loadingSpinner.style.display = 'none';
-    listingsContainer.style.display = 'grid';
+    if (loadingSpinner) loadingSpinner.style.display = 'none';
+    if (listingsContainer) listingsContainer.style.display = 'grid';
 }
 
 function showNoResults() {
-    listingsContainer.style.display = 'none';
-    noResults.style.display = 'block';
+    if (listingsContainer) listingsContainer.style.display = 'none';
+    if (noResults) noResults.style.display = 'block';
 }
 
 function hideNoResults() {
-    noResults.style.display = 'none';
+    if (noResults) noResults.style.display = 'none';
 }
 
 // Utility functions
@@ -514,7 +400,7 @@ function viewListingDetails(listingId) {
     window.location.href = `ilan-detay.html?id=${listingId}`;
 }
 
-// Edit function - Now available to all logged in users (NO ownership check)
+// Edit function - Available to all logged in users
 function editListing(listingId) {
     console.log('Edit listing clicked for ID:', listingId);
     
@@ -523,7 +409,7 @@ function editListing(listingId) {
         return;
     }
     
-    const listing = listings.find(l => l.id === listingId);
+    const listing = allListings.find(l => l.id === listingId);
     if (!listing) {
         alert('İlan bulunamadı.');
         return;
@@ -531,28 +417,4 @@ function editListing(listingId) {
     
     console.log('Redirecting to edit page for listing:', listingId);
     window.location.href = `ilan-duzenle.html?id=${listingId}`;
-}
-
-// Function to update listing (called from edit page)
-function updateListing(listingId, updatedData) {
-    const index = listings.findIndex(l => l.id === listingId);
-    if (index !== -1) {
-        listings[index] = { ...listings[index], ...updatedData, updatedAt: new Date().toISOString() };
-        return listings[index];
-    }
-    return null;
-}
-
-// Function to add new listing (called from add-listing page)
-function addNewListing(listingData) {
-    const newListing = {
-        id: listings.length > 0 ? Math.max(...listings.map(l => l.id)) + 1 : 1,
-        ...listingData,
-        createdBy: currentUser ? currentUser.id : 'anonymous',
-        createdAt: new Date().toISOString(),
-        image: listingData.image || "https://via.placeholder.com/250x200/667eea/ffffff?text=Resim+Yok"
-    };
-    
-    listings.unshift(newListing);
-    return newListing;
 }
