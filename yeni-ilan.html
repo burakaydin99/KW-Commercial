@@ -189,13 +189,16 @@
     <script type="module">
         import { authService } from './js/auth-service.js';
         import { firestoreService } from './js/firestore-service.js';
+        import { userService } from './js/user-service.js';
         
-        // Global olarak erişilebilir yap
         window.authService = authService;
         window.firestoreService = firestoreService;
+        window.userService = userService;
+        
+        console.log('✅ Firebase servisleri global olarak yüklendi');
     </script>
     
     <!-- Script dosyasını en sona taşıyın -->
-    <script src="js/add-listing.js"></script>
+    <script src="js/yeni-ilan.js"></script>
 </body>
 </html>

@@ -115,7 +115,7 @@ class FirestoreService {
     }
   }
 
-  // İlan güncelleme
+ // İlan güncelleme
   async updateListing(listingId, updatedData, imageFile = null) {
     try {
       const docRef = doc(db, this.listingsCollection, listingId);
