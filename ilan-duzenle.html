@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İlan Düzenle - KW Commercial</title>
-    <script src="js/shared-data.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/ilan-duzenle.css">
+    
+    <!-- Firebase SDK'sını önce yükle -->
     <script src="js/firebase-config.js" type="module"></script>
     <script src="js/auth-service.js" type="module"></script>
     <script src="js/firestore-service.js" type="module"></script>
+    <script src="js/user-service.js" type="module"></script>
 </head>
 <body>
     <!-- Header -->
@@ -39,7 +41,7 @@
         <div class="error-container">
             <h2>İlan Bulunamadı</h2>
             <p>Düzenlemek istediğiniz ilan mevcut değil veya düzenleme yetkiniz bulunmuyor.</p>
-            <button class="back-btn" onclick="goBack()">← Ana Sayfaya Dön</button>
+            <button class="back-btn" onclick="goHome()">← Ana Sayfaya Dön</button>
         </div>
     </div>
 
@@ -50,7 +52,7 @@
                 <h2>İlan Düzenle</h2>
                 <p>Ticari gayrimenkul ilanınızın detaylarını güncelleyiniz</p>
             </div>
-            <button class="back-btn" onclick="goBack()">← Geri Dön</button>
+            <button class="back-btn" onclick="goHome()">← Ana Sayfaya Dön</button>
         </div>
 
         <form id="editListingForm" class="listing-form">
@@ -72,12 +74,33 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="advisorDetails">Danışman Detay *</label>
-                        <input type="text" id="advisorDetails" name="advisorDetails" required 
-                               placeholder="Danışman adı ve iletişim bilgileri">
+                        <label for="advisorName">Danışman Adı *</label>
+                        <input type="text" id="advisorName" name="advisorName" required 
+                               placeholder="Danışman adı" minlength="2" maxlength="50">
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="advisorPhone">Danışman Telefonu</label>
+                        <input type="tel" id="advisorPhone" name="advisorPhone" 
+                               placeholder="90XXXXXXXXXX" pattern="90[0-9]{10}"
+                               title="Türkiye format: 90XXXXXXXXXX">
+                        <small class="phone-help">Format: 90XXXXXXXXXX (WhatsApp için)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="advisorEmail">Danışman E-Mail</label>
+                        <input type="email" id="advisorEmail" name="advisorEmail" readonly 
+                               class="readonly-field">
+                        <small class="email-help">E-mail değiştirilemez (yetki kontrolü için)</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Portföy Detayları</h3>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="portfolioType">Portföy Cinsi *</label>
@@ -108,10 +131,6 @@
                         </select>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-section">
-                <h3>Konum Bilgileri</h3>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -202,8 +221,8 @@
                 <button type="button" class="delete-btn" id="deleteBtn">
                     🗑️ İlanı Sil
                 </button>
-                <button type="button" class="cancel-btn" onclick="goBack()">
-                    İptal
+                <button type="button" class="cancel-btn" onclick="goHome()">
+                    Ana Sayfaya Dön
                 </button>
                 <button type="submit" class="submit-btn">
                     💾 Değişiklikleri Kaydet
@@ -212,25 +231,21 @@
         </form>
     </div>
 
-    <!-- Saving Indicator -->
-    <div class="saving-indicator" id="savingIndicator" style="display: none;">
-        Kaydediliyor...
-    </div>
+    <!-- Firebase servisleri global olarak erişilebilir yap -->
+    <script type="module">
+        import { authService } from './js/auth-service.js';
+        import { firestoreService } from './js/firestore-service.js';
+        import { userService } from './js/user-service.js';
+        
+        // Global olarak erişilebilir yap
+        window.authService = authService;
+        window.firestoreService = firestoreService;
+        window.userService = userService;
+        
+        console.log('✅ Firebase servisleri global olarak yüklendi');
+    </script>
 
-
-
-<script type="module">
-    import { authService } from './js/auth-service.js';
-    import { firestoreService } from './js/firestore-service.js';
-    
-    // Global olarak erişilebilir yap
-    window.authService = authService;
-    window.firestoreService = firestoreService;
-    
-    console.log('✅ Firebase servisleri global olarak yüklendi');
-</script>
-
-    <!-- Script dosyasını en sona taşıyın -->
+    <!-- Ana JavaScript dosyasını yükle -->
     <script src="js/ilan-duzenle.js"></script>
 </body>
 </html>

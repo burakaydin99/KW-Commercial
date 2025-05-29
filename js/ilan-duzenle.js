@@ -1,4 +1,4 @@
-// ilan-duzenle.js - Auth sorunları düzeltilmiş versiyon
+// ilan-duzenle.js - Tamamlanmış versiyon
 
 // Location data
 const locationData = {
@@ -28,6 +28,7 @@ const locationData = {
 // State variables
 let currentUser = null;
 let currentListing = null;
+let userProfile = null;
 let hasUnsavedChanges = false;
 let originalImageUrl = null;
 let authInitialized = false;
@@ -72,7 +73,7 @@ async function waitForFirebaseServices() {
     const maxAttempts = 100; // 10 saniye
     
     while (attempts < maxAttempts) {
-        if (window.authService && window.firestoreService) {
+        if (window.authService && window.firestoreService && window.userService) {
             console.log('✅ Firebase servisleri yüklendi');
             return;
         }
@@ -98,15 +99,23 @@ async function initializeAuth() {
         if (currentUser) {
             console.log('✅ Kullanıcı zaten giriş yapmış:', currentUser.email);
             updateAuthUI(currentUser);
+            await loadUserProfile();
             authInitialized = true;
             return;
         }
         
         // Auth state değişikliklerini dinle
-        window.authService.onAuthStateChange((user) => {
+        window.authService.onAuthStateChange(async (user) => {
             console.log('👤 Auth state değişti:', user ? user.email : 'Çıkış yapıldı');
             currentUser = user;
             updateAuthUI(user);
+            
+            if (user) {
+                await loadUserProfile();
+            } else {
+                userProfile = null;
+            }
+            
             authInitialized = true;
             
             // Eğer kullanıcı giriş yaptıysa ve henüz ilan yüklenmediyse, yükle
@@ -138,6 +147,37 @@ async function initializeAuth() {
         console.error('❌ Auth başlatma hatası:', error);
         throw error;
     }
+}
+
+// Kullanıcı profilini yükle
+async function loadUserProfile() {
+    try {
+        if (!currentUser) return;
+        
+        console.log('👤 Kullanıcı profili yükleniyor...');
+        userProfile = await window.userService.getUserProfile();
+        console.log('✅ Kullanıcı profili yüklendi:', userProfile);
+        
+        // Form alanlarını doldur
+        populateUserFields();
+        
+    } catch (error) {
+        console.error('❌ Kullanıcı profili yükleme hatası:', error);
+        userProfile = null;
+    }
+}
+
+// Kullanıcı alanlarını doldur
+function populateUserFields() {
+    if (!userProfile) return;
+    
+    const advisorNameField = document.getElementById('advisorName');
+    const advisorPhoneField = document.getElementById('advisorPhone');
+    const advisorEmailField = document.getElementById('advisorEmail');
+    
+    if (advisorNameField) advisorNameField.value = userProfile.name || '';
+    if (advisorPhoneField) advisorPhoneField.value = userProfile.phone || '';
+    if (advisorEmailField) advisorEmailField.value = userProfile.email || '';
 }
 
 function updateAuthUI(user) {
@@ -210,15 +250,9 @@ function showLoginRequired() {
         if (errorText) {
             errorText.innerHTML = `
                 İlan düzenlemek için giriş yapmanız gerekiyor.<br><br>
-                <button onclick="handleLogin()" style="
-                    background: #4285f4; 
-                    color: white; 
-                    border: none; 
-                    padding: 10px 20px; 
-                    border-radius: 5px; 
-                    cursor: pointer;
-                    margin-top: 10px;
-                ">🔑 Google ile Giriş Yap</button>
+                <button onclick="handleLogin()" class="login-required-btn">
+                    🔑 Google ile Giriş Yap
+                </button>
             `;
         }
     }
@@ -259,6 +293,13 @@ function setupEventListeners() {
     const listingImageInput = document.getElementById('listingImage');
     if (listingImageInput) listingImageInput.addEventListener('change', handleImageUpload);
     
+    // Phone number formatting
+    const phoneField = document.getElementById('advisorPhone');
+    if (phoneField) {
+        phoneField.addEventListener('input', handlePhoneInput);
+        phoneField.addEventListener('blur', validatePhoneNumber);
+    }
+    
     // Track changes for unsaved changes warning
     setupChangeTracking();
     
@@ -283,7 +324,7 @@ function setupEventListeners() {
         
         // Escape to go back
         if (event.key === 'Escape') {
-            goBack();
+            goHome();
         }
     });
     
@@ -296,11 +337,52 @@ function setupEventListeners() {
     });
 }
 
+// Telefon numarası input işleme
+function handlePhoneInput(event) {
+    let value = event.target.value.replace(/\D/g, ''); // Sadece rakamlar
+    
+    // 90 ile başlamıyorsa otomatik ekle
+    if (value && !value.startsWith('90')) {
+        if (value.startsWith('0')) {
+            value = '90' + value.substring(1);
+        } else if (value.startsWith('5')) {
+            value = '90' + value;
+        }
+    }
+    
+    // Maksimum 12 karakter (90XXXXXXXXXX)
+    if (value.length > 12) {
+        value = value.substring(0, 12);
+    }
+    
+    event.target.value = value;
+    hasUnsavedChanges = true;
+}
+
+// Telefon numarası validasyonu
+function validatePhoneNumber() {
+    const phoneField = document.getElementById('advisorPhone');
+    if (!phoneField || !phoneField.value) return true;
+    
+    const phone = phoneField.value;
+    const isValid = /^90[0-9]{10}$/.test(phone);
+    
+    if (!isValid && phone.length > 0) {
+        phoneField.classList.add('field-error');
+        showTempMessage('Geçersiz telefon formatı. Örnek: 905551234567', 'error');
+        return false;
+    } else {
+        phoneField.classList.remove('field-error');
+        phoneField.classList.add('field-updated');
+        return true;
+    }
+}
+
 function setupChangeTracking() {
     const editListingForm = document.getElementById('editListingForm');
     if (!editListingForm) return;
     
-    const formElements = editListingForm.querySelectorAll('input, select, textarea');
+    const formElements = editListingForm.querySelectorAll('input:not([readonly]), select, textarea');
     
     formElements.forEach(element => {
         element.addEventListener('input', function() {
@@ -327,7 +409,7 @@ function getListingIdFromUrl() {
 
 async function loadListingForEdit() {
     const listingId = getListingIdFromUrl();
-    console.log(' KW Teknoloji | İlan yükleniyor, ID:', listingId);
+    console.log('📋 KW Teknoloji | İlan yükleniyor, ID:', listingId);
     
     if (!listingId) {
         showError('İlan ID\'si bulunamadı.');
@@ -344,10 +426,10 @@ async function loadListingForEdit() {
         showLoading();
         
         // Firestore'dan ilan verisini çek
-        console.log('KW Teknoloji | ilan yükleniyor:', listingId);
+        console.log('📋 KW Teknoloji | ilan yükleniyor:', listingId);
         const listing = await window.firestoreService.getListing(listingId);
         
-        console.log(' Yüklenen ilan:', listing);
+        console.log('📋 Yüklenen ilan:', listing);
         
         if (!listing) {
             showError('İlan bulunamadı.');
@@ -380,10 +462,9 @@ function populateForm(listing) {
     // Update page title
     document.title = `Düzenle: ${listing.title} - KW Commercial`;
 
-    // Basic info - Flexible field mapping
+    // Basic info
     setValue('listingTitle', listing.title);
     setValue('listingDate', listing.date);
-    setValue('advisorDetails', listing.advisorDetails || listing.advisor); // Try both field names
     setValue('portfolioType', listing.portfolioType);
     setValue('usagePurpose', listing.usagePurpose);
 
@@ -571,9 +652,7 @@ function showBrokenImagePlaceholder() {
         
         // Kullanıcıya bilgi ver
         const errorMsg = document.createElement('p');
-        errorMsg.style.color = '#ff4757';
-        errorMsg.style.fontSize = '0.9rem';
-        errorMsg.style.marginTop = '5px';
+        errorMsg.className = 'image-error';
         errorMsg.textContent = 'Orijinal görsel bulunamadı. Lütfen yeni bir görsel yükleyiniz.';
         
         // Varolan error mesajını kaldır
@@ -582,7 +661,6 @@ function showBrokenImagePlaceholder() {
             existingError.remove();
         }
         
-        errorMsg.className = 'image-error';
         currentImage.appendChild(errorMsg);
     }
 }
@@ -605,11 +683,25 @@ async function handleFormSubmit(event) {
         const formData = new FormData(event.target);
         const listingImageInput = document.getElementById('listingImage');
         
-        // Güncellenen veri
+        // Kullanıcı bilgilerini güncelle
+        const userData = {
+            name: formData.get('advisorName'),
+            phone: formData.get('advisorPhone'),
+            email: currentUser.email // Email değişmez
+        };
+        
+        // Kullanıcı profilini güncelle
+        await window.userService.createOrUpdateUserProfile(userData);
+        console.log('✅ Kullanıcı profili güncellendi');
+        
+        // İlan verilerini güncelle
         const updatedData = {
             title: formData.get('listingTitle'),
             date: formData.get('listingDate'),
-            advisorDetails: formData.get('advisorDetails'),
+            advisor: formData.get('advisorName'),
+            advisorDetails: formData.get('advisorName'),
+            advisorPhone: formData.get('advisorPhone'),
+            advisorEmail: currentUser.email,
             portfolioType: formData.get('portfolioType'),
             usagePurpose: formData.get('usagePurpose'),
             city: formData.get('city'),
@@ -642,7 +734,7 @@ async function handleFormSubmit(event) {
         
     } catch (error) {
         console.error('❌ Güncelleme hatası:', error);
-        showSavingIndicator('Kaydetme sırasında hata oluştu!', 'error');
+        showSavingIndicator('Kaydetme sırasında hata oluştu: ' + error.message, 'error');
     }
 }
 
@@ -650,7 +742,7 @@ function validateForm() {
     const requiredFields = [
         'listingTitle',
         'listingDate', 
-        'advisorDetails',
+        'advisorName',
         'portfolioType',
         'usagePurpose',
         'city',
@@ -676,6 +768,22 @@ function validateForm() {
             alert(`Lütfen ${labelText} alanını doldurunuz.`);
             return false;
         }
+    }
+    
+    // Validate advisor name length
+    const nameField = document.getElementById('advisorName');
+    if (nameField && nameField.value) {
+        if (nameField.value.length < 2 || nameField.value.length > 50) {
+            nameField.classList.add('field-error');
+            nameField.focus();
+            alert('Danışman adı 2-50 karakter arasında olmalıdır.');
+            return false;
+        }
+    }
+    
+    // Validate phone number
+    if (!validatePhoneNumber()) {
+        return false;
     }
     
     // Validate price
@@ -726,7 +834,7 @@ async function handleDelete() {
         
     } catch (error) {
         console.error('Silme hatası:', error);
-        showSavingIndicator('Silme sırasında hata oluştu!', 'error');
+        showSavingIndicator('Silme sırasında hata oluştu: ' + error.message, 'error');
     }
 }
 
@@ -789,90 +897,224 @@ function showSavingIndicator(message, type = '') {
     indicator.className = `saving-indicator ${type}`;
     indicator.textContent = message;
     
-    // Apply styles
-    indicator.style.position = 'fixed';
-    indicator.style.top = '20px';
-    indicator.style.right = '20px';
-    indicator.style.padding = '15px 25px';
-    indicator.style.borderRadius = '25px';
-    indicator.style.fontWeight = '500';
-    indicator.style.zIndex = '1000';
-    indicator.style.opacity = '0';
-    indicator.style.transform = 'translateY(-20px)';
-    indicator.style.transition = 'all 0.3s ease';
-    
-    // Set colors based on type
-    if (type === 'success') {
-        indicator.style.background = '#52c41a';
-        indicator.style.color = 'white';
-    } else if (type === 'error') {
-        indicator.style.background = '#ff4757';
-        indicator.style.color = 'white';
-    } else {
-        indicator.style.background = '#667eea';
-        indicator.style.color = 'white';
-    }
-    
     document.body.appendChild(indicator);
     
-    // Show indicator
+    // Animate in
     setTimeout(() => {
         indicator.style.opacity = '1';
         indicator.style.transform = 'translateY(0)';
-    }, 100);
+    }, 10);
     
-    // Hide indicator after delay (except for loading states)
-    if (type !== '') {
+    // Auto hide after delay (except for errors)
+    if (type !== 'error') {
         setTimeout(() => {
-            indicator.style.opacity = '0';
-            indicator.style.transform = 'translateY(-20px)';
-            setTimeout(() => {
-                if (indicator.parentNode) {
-                    indicator.remove();
-                }
-            }, 300);
-        }, 3000);
+            if (indicator.parentNode) {
+                indicator.style.opacity = '0';
+                indicator.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.remove();
+                    }
+                }, 300);
+            }
+        }, type === 'success' ? 2000 : 3000);
     }
-}
+}// Animate in
+    setTimeout(() => {
+        indicator.style.opacity = '1';
+        indicator.style.transform = 'translateY(0)';
+    }, 10);
+    
+    // Auto hide after delay (except for errors)
+    if (type !== 'error') {
+        setTimeout(() => {
+            if (indicator.parentNode) {
+                indicator.style.opacity = '0';
+                indicator.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.remove();
+                    }
+                }, 300);
+            }
+        }, type === 'success' ? 2000 : 3000);
+    }
+
 
 function hideSavingIndicator() {
     const indicator = document.querySelector('.saving-indicator');
     if (indicator) {
-        indicator.remove();
+        indicator.style.opacity = '0';
+        indicator.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            if (indicator.parentNode) {
+                indicator.remove();
+            }
+        }, 300);
     }
 }
 
+function showTempMessage(message, type = 'info') {
+    // Remove existing temp messages
+    const existingMessages = document.querySelectorAll('.temp-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    // Create new message
+    const msgElement = document.createElement('div');
+    msgElement.className = `temp-message ${type}`;
+    msgElement.textContent = message;
+    
+    document.body.appendChild(msgElement);
+    
+    // Animate in
+    setTimeout(() => {
+        msgElement.style.opacity = '1';
+    }, 10);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (msgElement.parentNode) {
+            msgElement.style.opacity = '0';
+            setTimeout(() => {
+                if (msgElement.parentNode) {
+                    msgElement.remove();
+                }
+            }, 300);
+        }
+    }, 3000);
+}
+
 // ================================
-// NAVIGATION
+// UTILITY FUNCTIONS
 // ================================
 
-function goBack() {
+function goHome() {
     if (hasUnsavedChanges) {
-        if (!confirm('Kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinizden emin misiniz?')) {
+        if (!confirm('Kaydedilmemiş değişiklikleriniz var. Ana sayfaya dönmek istediğinizden emin misiniz?')) {
             return;
         }
     }
+    window.location.href = 'index.html';
+}
+
+function formatPrice(price) {
+    if (!price || isNaN(price)) return '0';
+    return new Intl.NumberFormat('tr-TR').format(price);
+}
+
+function formatPhoneNumber(phone) {
+    if (!phone) return '';
     
-    // Check if there's history to go back to
-    if (document.referrer && document.referrer.includes(window.location.hostname)) {
-        window.history.back();
-    } else {
-        // Fallback to listing detail or main page
-        if (currentListing) {
-            window.location.href = `ilan-detay.html?id=${currentListing.id}`;
-        } else {
-            window.location.href = 'index.html';
-        }
+    // Remove all non-digits
+    const cleaned = phone.replace(/\D/g, '');
+    
+    // Format as +90 (5XX) XXX XX XX
+    if (cleaned.length === 12 && cleaned.startsWith('90')) {
+        const areaCode = cleaned.substring(2, 5);
+        const first = cleaned.substring(5, 8);
+        const second = cleaned.substring(8, 10);
+        const third = cleaned.substring(10, 12);
+        return `+90 (${areaCode}) ${first} ${second} ${third}`;
     }
+    
+    return phone; // Return original if format doesn't match
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 // ================================
-// GLOBAL FUNCTIONS (for HTML onclick handlers)
+// KEYBOARD SHORTCUTS INFO
 // ================================
 
-// Make functions globally available for HTML onclick handlers
-window.goBack = goBack;
-window.removeImage = removeImage;
-window.handleLogin = handleLogin;
+function showKeyboardShortcuts() {
+    const shortcuts = [
+        'Ctrl + S: Kaydet',
+        'Esc: Ana sayfaya dön',
+        'Tab: Sonraki alan',
+        'Shift + Tab: Önceki alan'
+    ];
+    
+    const shortcutInfo = shortcuts.join('\n');
+    alert('Klavye Kısayolları:\n\n' + shortcutInfo);
+}
 
-console.log('✅ İlan düzenleme sayfası hazır');
+// ================================
+// GLOBAL FUNCTIONS (for HTML onclick events)
+// ================================
+
+// Global olarak erişilebilir fonksiyonlar
+window.goHome = goHome;
+window.removeImage = removeImage;
+window.showKeyboardShortcuts = showKeyboardShortcuts;
+
+// ================================
+// ERROR HANDLING
+// ================================
+
+// Global error handler
+window.addEventListener('error', function(event) {
+    console.error('Global JavaScript hatası:', event.error);
+    showTempMessage('Beklenmeyen bir hata oluştu. Lütfen sayfayı yenileyin.', 'error');
+});
+
+// Unhandled promise rejection handler
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('İşlenmeyen Promise hatası:', event.reason);
+    showTempMessage('Bir işlem tamamlanamadı. Lütfen tekrar deneyin.', 'error');
+});
+
+// ================================
+// PERFORMANCE OPTIMIZATION
+// ================================
+
+// Debounced input handlers for better performance
+const debouncedPhoneInput = debounce(handlePhoneInput, 300);
+const debouncedValidatePhone = debounce(validatePhoneNumber, 500);
+
+// ================================
+// BROWSER COMPATIBILITY
+// ================================
+
+// Check for required browser features
+function checkBrowserCompatibility() {
+    const requiredFeatures = [
+        'fetch',
+        'Promise',
+        'localStorage',
+        'addEventListener'
+    ];
+    
+    const unsupportedFeatures = requiredFeatures.filter(feature => 
+        typeof window[feature] === 'undefined'
+    );
+    
+    if (unsupportedFeatures.length > 0) {
+        alert(`Tarayıcınız bu uygulamayı tam olarak desteklemiyor. 
+               Eksik özellikler: ${unsupportedFeatures.join(', ')}
+               Lütfen tarayıcınızı güncelleyin.`);
+        return false;
+    }
+    
+    return true;
+}
+
+// ================================
+// INITIALIZATION CHECK
+// ================================
+
+// Check browser compatibility on load
+if (!checkBrowserCompatibility()) {
+    console.error('❌ Tarayıcı uyumluluğu sorunu');
+}
+
+console.log('✅ İlan düzenleme modülü başarıyla yüklendi');
