@@ -1,4 +1,4 @@
-// js/user-service.js - Kullanıcı bilgileri yönetimi için Firestore servisi
+// js/user-service.js - Kullanıcı bilgileri yönetimi için Firestore servisi (Bölge Müdürlüğü eklendi)
 import { db, auth } from './firebase-config.js';
 import { 
   collection, 
@@ -40,6 +40,18 @@ class UserService {
       if (userData.name) {
         if (userData.name.length < 2 || userData.name.length > 50) {
           throw new Error('İsim 2-50 karakter arasında olmalıdır');
+        }
+      }
+
+      // Bölge müdürlüğü kontrolü
+      if (userData.regionalOffice) {
+        const validOffices = [
+          'KW Platin', 'KW Altın', 'KW Gümüş', 'KW Bronz', 'KW Merkez',
+          'KW İstanbul', 'KW Ankara', 'KW İzmir', 'KW Bursa', 'KW Antalya'
+        ];
+        
+        if (!validOffices.includes(userData.regionalOffice)) {
+          throw new Error('Geçersiz bölge müdürlüğü seçimi');
         }
       }
 
@@ -95,6 +107,24 @@ class UserService {
     }
   }
 
+  // Kullanıcının tam adını ve bölge müdürlüğünü birleştirerek döndür
+  getUserDisplayName(userProfile) {
+    if (!userProfile) return '';
+    
+    const name = userProfile.name || '';
+    const office = userProfile.regionalOffice || '';
+    
+    if (name && office) {
+      return `${name} | ${office}`;
+    } else if (name) {
+      return name;
+    } else if (office) {
+      return office;
+    } else {
+      return 'KW Commercial';
+    }
+  }
+
   // Telefon numarası formatını düzenle
   formatPhoneNumber(phone) {
     if (!phone) return '';
@@ -146,6 +176,7 @@ class UserService {
       const syncedData = {
         name: firestoreProfile?.name || googleSheetData?.name || user.displayName || '',
         phone: firestoreProfile?.phone || googleSheetData?.phone || '',
+        regionalOffice: firestoreProfile?.regionalOffice || googleSheetData?.regionalOffice || '',
         email: user.email, // Email her zaman Google'dan
         role: googleSheetData?.role || 'user',
         status: googleSheetData?.status || 'active'
@@ -194,6 +225,22 @@ class UserService {
         views: 0
       };
     }
+  }
+
+  // Bölge müdürlüğü listesi
+  getRegionalOffices() {
+    return [
+      { value: 'KW Platin', label: 'KW Platin' },
+      { value: 'KW Altın', label: 'KW Altın' },
+      { value: 'KW Gümüş', label: 'KW Gümüş' },
+      { value: 'KW Bronz', label: 'KW Bronz' },
+      { value: 'KW Merkez', label: 'KW Merkez' },
+      { value: 'KW İstanbul', label: 'KW İstanbul' },
+      { value: 'KW Ankara', label: 'KW Ankara' },
+      { value: 'KW İzmir', label: 'KW İzmir' },
+      { value: 'KW Bursa', label: 'KW Bursa' },
+      { value: 'KW Antalya', label: 'KW Antalya' }
+    ];
   }
 }
 

@@ -618,3 +618,15 @@ body {
     background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
     transform: translateY(-1px);
 }
+
+.user-name-link {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px 8px;
+    border-radius: 6px;
+}
+
+.user-name-link:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+}

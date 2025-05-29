@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hesabım - KW Commercial</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/hesabim.css">
+    
+    <!-- Firebase SDK'sını önce yükle -->
+    <script src="js/firebase-config.js" type="module"></script>
+    <script src="js/auth-service.js" type="module"></script>
+    <script src="js/firestore-service.js" type="module"></script>
+    <script src="js/user-service.js" type="module"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html">KW Commercial</a></h1>
+            </div>
+            <div class="auth-section">
+                <button id="loginBtn" class="login-btn">Google ile Giriş Yap</button>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName" onclick="window.location.href='hesabim.html'" class="user-name-link">Kullanıcı</span>
+                    <button id="logoutBtn" class="logout-btn">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="loading" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p>KW Teknoloji | Hesap bilgileri yükleniyor...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage" style="display: none;">
+        <div class="error-container">
+            <h2>Erişim Hatası</h2>
+            <p>Hesap bilgilerinize erişmek için giriş yapmanız gerekiyor.</p>
+            <button class="login-required-btn" onclick="handleLogin()">
+                🔑 Google ile Giriş Yap
+            </button>
+            <button class="back-btn" onclick="goHome()">← Ana Sayfaya Dön</button>
+        </div>
+    </div>
+
+    <!-- Account Container -->
+    <div class="account-container" id="accountContainer" style="display: none;">
+        <div class="account-header">
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <img id="userAvatar" src="" alt="Profil Fotoğrafı" class="avatar-img">
+                    <div class="avatar-fallback" id="avatarFallback">
+                        <span id="avatarInitials">KW</span>
+                    </div>
+                </div>
+                <div class="profile-details">
+                    <h1 id="displayName" class="profile-name">Kullanıcı Adı</h1>
+                    <p id="displayTitle" class="profile-title">KW Commercial</p>
+                    <p id="displayEmail" class="profile-email">email@example.com</p>
+                </div>
+            </div>
+            <button class="back-btn" onclick="goHome()">← Ana Sayfaya Dön</button>
+        </div>
+
+        <!-- Account Form -->
+        <div class="account-form-container">
+            <form id="accountForm" class="account-form">
+                <div class="form-section">
+                    <h3>Kişisel Bilgiler</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Ad Soyad *</label>
+                            <input type="text" id="fullName" name="fullName" required 
+                                   placeholder="Örn: Burak AYDIN" minlength="2" maxlength="50">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Telefon Numarası</label>
+                            <input type="tel" id="phone" name="phone" 
+                                   placeholder="90XXXXXXXXXX" pattern="90[0-9]{10}"
+                                   title="Türkiye format: 90XXXXXXXXXX">
+                            <small class="phone-help">Format: 90XXXXXXXXXX (WhatsApp için)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="regionalOffice">Bölge Müdürlüğü *</label>
+                            <select id="regionalOffice" name="regionalOffice" required>
+                                <option value="">Seçiniz</option>
+                                <option value="KW Platin">KW Platin</option>
+                                <option value="KW Altın">KW Altın</option>
+                                <option value="KW Gümüş">KW Gümüş</option>
+                                <option value="KW Bronz">KW Bronz</option>
+                                <option value="KW Merkez">KW Merkez</option>
+                                <option value="KW İstanbul">KW İstanbul</option>
+                                <option value="KW Ankara">KW Ankara</option>
+                                <option value="KW İzmir">KW İzmir</option>
+                                <option value="KW Bursa">KW Bursa</option>
+                                <option value="KW Antalya">KW Antalya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">E-Mail Adresi</label>
+                            <input type="email" id="email" name="email" readonly 
+                                   class="readonly-field">
+                            <small class="email-help">E-mail adresi Google hesabınızdan alınır ve değiştirilemez</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Stats -->
+                <div class="form-section">
+                    <h3>Hesap İstatistikleri</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🏢</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalListings">0</span>
+                                <span class="stat-label">Toplam İlan</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="activeListings">0</span>
+                                <span class="stat-label">Aktif İlan</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">👁️</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalViews">0</span>
+                                <span class="stat-label">Toplam Görüntüleme</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="memberSince">-</span>
+                                <span class="stat-label">Üyelik Tarihi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="goHome()">
+                        Ana Sayfaya Dön
+                    </button>
+                    <button type="submit" class="save-btn">
+                        💾 Bilgileri Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase servisleri global olarak erişilebilir yap -->
+    <script type="module">
+        import { authService } from './js/auth-service.js';
+        import { firestoreService } from './js/firestore-service.js';
+        import { userService } from './js/user-service.js';
+        
+        // Global olarak erişilebilir yap
+        window.authService = authService;
+        window.firestoreService = firestoreService;
+        window.userService = userService;
+        
+        console.log('✅ Firebase servisleri global olarak yüklendi');
+    </script>
+
+    <!-- Ana JavaScript dosyasını yükle -->
+    <script src="js/hesabim.js"></script>
+</body>
+</html>
